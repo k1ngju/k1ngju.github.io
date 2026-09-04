@@ -1,0 +1,402 @@
+<title>Kolektorji ali paneli?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Public+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F7F4EE; --surface:#FFFFFF; --surface-2:#FBF8F2;
+    --ink:#20241F; --muted:#6C6F66; --faint:#93958B;
+    --border:#E7E1D5; --border-strong:#D8D0BF;
+    --solar:#DB8A1B; --solar-soft:#F6E4C4; --solar-ink:#8A5410;
+    --water:#2C8790; --water-soft:#CFE7E7; --water-ink:#1D5C63;
+    --pos:#3E8B58; --neg:#BF4A2C;
+    --shadow:0 1px 2px rgba(40,34,20,.04),0 6px 24px rgba(40,34,20,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#15171A; --surface:#1D2024; --surface-2:#22262B;
+      --ink:#ECE8DF; --muted:#A2A69B; --faint:#787C72;
+      --border:#2E333A; --border-strong:#3A4048;
+      --solar:#E6A542; --solar-soft:#3A2E18; --solar-ink:#E9B968;
+      --water:#54AEB6; --water-soft:#16302F; --water-ink:#7FCBD1;
+      --pos:#5FB37C; --neg:#DB6A4B;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15171A; --surface:#1D2024; --surface-2:#22262B;
+    --ink:#ECE8DF; --muted:#A2A69B; --faint:#787C72;
+    --border:#2E333A; --border-strong:#3A4048;
+    --solar:#E6A542; --solar-soft:#3A2E18; --solar-ink:#E9B968;
+    --water:#54AEB6; --water-soft:#16302F; --water-ink:#7FCBD1;
+    --pos:#5FB37C; --neg:#DB6A4B;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:clamp(20px,5vw,64px) clamp(16px,4vw,40px);}
+  .num{font-family:"Spline Sans Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+
+  /* Header */
+  .eyebrow{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--solar);font-weight:500;}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(34px,6vw,54px);
+    line-height:1.04;letter-spacing:-.015em;margin:.28em 0 .3em;text-wrap:balance;}
+  .lede{font-size:clamp(17px,2.4vw,20px);color:var(--muted);max-width:60ch;margin:0;}
+  .meta{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--faint);
+    font-family:"Spline Sans Mono",monospace;}
+  .meta b{color:var(--muted);font-weight:500;}
+
+  /* Verdict */
+  .verdict{margin:40px 0;display:grid;gap:14px;grid-template-columns:1fr 1fr;}
+  @media(max-width:640px){.verdict{grid-template-columns:1fr}}
+  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px 22px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .vcard::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;}
+  .vcard.house::before{background:var(--solar);}
+  .vcard.balcony::before{background:var(--water);}
+  .vcard .tag{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);}
+  .vcard h3{font-family:"Fraunces",serif;font-weight:600;font-size:20px;margin:6px 0 10px;line-height:1.15;}
+  .vcard p{margin:0;font-size:14.5px;color:var(--muted);}
+  .vcard .win{color:var(--ink);font-weight:600;}
+
+  section{margin:52px 0;}
+  .part-label{display:inline-flex;align-items:center;gap:10px;font-family:"Spline Sans Mono",monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .part-label .dot{width:9px;height:9px;border-radius:50%;}
+  h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(26px,4vw,34px);
+    letter-spacing:-.01em;line-height:1.1;margin:.1em 0 .35em;text-wrap:balance;}
+  h2 + .sub{color:var(--muted);font-size:16px;margin:0 0 8px;max-width:64ch;}
+  h4{font-family:"Fraunces",serif;font-weight:600;font-size:19px;margin:32px 0 12px;}
+
+  /* Table */
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:14px;
+    box-shadow:var(--shadow);background:var(--surface);margin-top:20px;}
+  table{border-collapse:collapse;width:100%;min-width:600px;font-size:14px;}
+  thead th{text-align:left;padding:16px 16px 14px;vertical-align:bottom;
+    border-bottom:1px solid var(--border-strong);background:var(--surface-2);}
+  thead th:first-child{width:150px;}
+  thead .cat{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--faint);font-weight:500;}
+  thead .name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;display:block;margin-top:3px;}
+  th.solar .name{color:var(--solar-ink);} th.water .name{color:var(--water-ink);}
+  th.solar{border-top:3px solid var(--solar);} th.water{border-top:3px solid var(--water);}
+  th.combo{border-top:3px solid var(--pos);} th.combo .name{color:var(--pos);}
+  tbody th{text-align:left;font-weight:600;font-size:13px;color:var(--muted);padding:14px 16px;
+    vertical-align:top;border-bottom:1px solid var(--border);}
+  tbody td{padding:14px 16px;vertical-align:top;border-bottom:1px solid var(--border);color:var(--ink);}
+  tbody tr:last-child th,tbody tr:last-child td{border-bottom:none;}
+  td .big{font-family:"Spline Sans Mono",monospace;font-weight:600;font-size:15px;display:block;}
+  td small{color:var(--muted);font-size:12.5px;}
+  .chip{display:inline-block;font-family:"Spline Sans Mono",monospace;font-size:11px;font-weight:500;
+    padding:1px 7px;border-radius:999px;margin-top:5px;}
+  .chip.good{background:var(--solar-soft);color:var(--solar-ink);}
+  .chip.pos{background:var(--water-soft);color:var(--water-ink);}
+
+  /* Prose + lists */
+  p.body{font-size:15.5px;color:var(--ink);max-width:66ch;}
+  ul.clean{list-style:none;padding:0;margin:14px 0;display:grid;gap:11px;}
+  ul.clean li{position:relative;padding-left:26px;font-size:15px;color:var(--ink);max-width:66ch;}
+  ul.clean li::before{content:"";position:absolute;left:4px;top:9px;width:8px;height:8px;
+    border-radius:2px;background:var(--solar);transform:rotate(45deg);}
+  ul.clean.water li::before{background:var(--water);}
+  ul.clean li b{font-weight:600;}
+
+  /* Callout */
+  .callout{border-radius:14px;padding:22px 24px;margin:26px 0;border:1px solid var(--border);
+    background:var(--surface);box-shadow:var(--shadow);}
+  .callout.warn{border-left:4px solid var(--solar);}
+  .callout .k{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--solar);font-weight:500;}
+  .callout h4{margin:6px 0 8px;font-size:18px;}
+  .callout p{margin:8px 0 0;font-size:14.5px;color:var(--muted);}
+  .callout p b{color:var(--ink);}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  @media(max-width:560px){.split{grid-template-columns:1fr}}
+  .split .box{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;}
+  .split .box .lbl{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;font-weight:500;}
+  .split .box.cheap .lbl{color:var(--pos);} .split .box.pricey .lbl{color:var(--neg);}
+  .split .box .amt{font-family:"Spline Sans Mono",monospace;font-weight:600;font-size:19px;margin:4px 0 2px;}
+  .split .box small{color:var(--muted);font-size:13px;}
+
+  /* Balcony stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0;}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 16px 18px;
+    box-shadow:var(--shadow);border-top:3px solid var(--water);}
+  .tile .t-lbl{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--faint);}
+  .tile .t-val{font-family:"Spline Sans Mono",monospace;font-weight:600;font-size:23px;
+    color:var(--water-ink);margin:7px 0 2px;line-height:1.05;}
+  .tile small{color:var(--muted);font-size:12.5px;}
+
+  .legal{background:var(--water-soft);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin:24px 0;}
+  .legal .k{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--water-ink);font-weight:600;}
+  .legal h4{margin:6px 0 10px;color:var(--water-ink);}
+  .legal ul{margin:0;padding-left:20px;color:var(--ink);font-size:14.5px;display:grid;gap:7px;}
+
+  hr.div{border:none;border-top:1px solid var(--border);margin:56px 0;}
+
+  /* Sources */
+  .sources{margin-top:16px;}
+  .sources h4{margin-bottom:12px;}
+  .src-grid{display:grid;gap:8px;}
+  .src-grid a{color:var(--muted);font-size:13.5px;text-decoration:none;padding:9px 12px;border-radius:9px;
+    border:1px solid var(--border);background:var(--surface);display:flex;gap:10px;transition:.15s;}
+  .src-grid a:hover{color:var(--ink);border-color:var(--border-strong);}
+  .src-grid a .dom{font-family:"Spline Sans Mono",monospace;color:var(--solar-ink);flex-shrink:0;}
+  .disclaimer{font-size:12.5px;color:var(--faint);margin-top:26px;line-height:1.55;max-width:70ch;}
+  a{color:var(--solar-ink);}
+  ::selection{background:var(--solar-soft);}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Ekonomska analiza · Slovenija 2025/2026</div>
+    <h1>Kolektorji ali paneli?</h1>
+    <p class="lede">Kaj se v Sloveniji danes bolj splača — solarni termični kolektorji za toplo vodo, ali fotovoltaični paneli? Odgovor je odvisen od skale investicije.</p>
+    <div class="meta">
+      <span><b>Scenarij:</b> 4-članska družina, enodružinska hiša</span>
+      <span><b>Elektrika:</b> ~0,20 €/kWh (2025)</span>
+      <span><b>Viri:</b> 8+ slovenskih</span>
+    </div>
+  </header>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <div class="vcard house">
+      <div class="tag">Hišna skala · 3.000–12.000 €</div>
+      <h3>Zmaga fotovoltaika</h3>
+      <p><span class="win">PV se splača bolj</span> kot čisti termični kolektorji — pokrije vso elektriko, ne le vodo. Za samo toplo vodo je najceneje <span class="win">PV + sanitarna toplotna črpalka</span>.</p>
+    </div>
+    <div class="vcard balcony">
+      <div class="tag">Balkonska skala · pod 1.000 €</div>
+      <h3>Zmaga balkonska PV</h3>
+      <p><span class="win">Vtična balkonska elektrarna</span> jasno prevlada. Termični kolektor na balkonu je nesmisel, zato tudi <span class="win">»mešano« odpade</span>.</p>
+    </div>
+  </div>
+
+  <p class="body">Kratek povzetek: pred ~15 leti so se za pripravo tople vode množično vgrajevali termični kolektorji. Cene fotovoltaike so od takrat strmoglavile, zato se je ekonomska logika obrnila. Spodaj razčlenim obe skali, ki te zanimata — hišno in balkonsko — s konkretnimi številkami in okvirnim izračunom povračila.</p>
+
+  <hr class="div">
+
+  <!-- PART A -->
+  <section>
+    <div class="part-label"><span class="dot" style="background:var(--solar)"></span>Del A — hišna skala</div>
+    <h2>Enodružinska hiša, 4 osebe</h2>
+    <p class="sub">Prava investicija na streho. Tri realne opcije, iste kategorije primerjave.</p>
+
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="water"><span class="cat">Termika</span><span class="name">Sončni kolektorji</span></th>
+            <th class="solar"><span class="cat">Elektrika</span><span class="name">Fotovoltaika (PV)</span></th>
+            <th class="combo"><span class="cat">Kombinacija</span><span class="name">PV + sanitarna TČ</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Investicija</th>
+            <td><span class="big num">3.000–5.000 €</span><small>2 kolektorja + zalogovnik 200–300 L</small></td>
+            <td><span class="big num">7.000–12.000 €</span><small>6–10 kW, brez hranilnika</small></td>
+            <td><span class="big num">+ 800–1.500 €</span><small>sanitarna TČ vrh PV sistema</small></td>
+          </tr>
+          <tr>
+            <th>Subvencija</th>
+            <td>Do 30 %, maks. ~300 €/m²<div class="chip pos">Eko sklad</div></td>
+            <td>Do 250 €/kW brez baterije,<br>do 675 €/kW z baterijo<div class="chip good">Borzen 2026</div></td>
+            <td>Kot PV; TČ ločeno prek Eko sklada</td>
+          </tr>
+          <tr>
+            <th>Kaj pokrije</th>
+            <td><b>Samo toplo vodo</b> (~80 %, poleti ~100 %, pozimi malo)</td>
+            <td><b>Vso elektriko</b> hiše — voda, aparati, ogrevanje, EV</td>
+            <td>Vso elektriko + poceni topla voda iz lastnih presežkov</td>
+          </tr>
+          <tr>
+            <th>Izkoristek / lastna raba</th>
+            <td>Visok termični izkoristek (~70–80 %), a ozek namen</td>
+            <td>Lastna poraba ~25 % brez baterije, 60–75 % z baterijo</td>
+            <td>TČ »shrani« dnevne presežke v toplo vodo → dvigne lastno rabo</td>
+          </tr>
+          <tr>
+            <th>Povračilo</th>
+            <td><span class="big num">~6 let</span><small>a le na strošku tople vode</small></td>
+            <td><span class="big num">7–9 let</span><small>~6–7 z baterijo</small></td>
+            <td><span class="big num">~7–9 let</span><small>najširša korist na € vložka</small></td>
+          </tr>
+          <tr>
+            <th>Življenjska doba</th>
+            <td>~20–25 let (zalogovnik/črpalka manj)</td>
+            <td><b>25+ let</b></td>
+            <td>PV 25+ let · TČ 20+ let</td>
+          </tr>
+          <tr>
+            <th>Vzdrževanje</th>
+            <td>Črpalka, glikol (menjava), pregrevanje poleti — <b>višje</b></td>
+            <td><b>Minimalno</b> — ni cevi, črpalk, tekočin</td>
+            <td>Minimalno (PV) + servis TČ</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Zakaj se je slika obrnila</h4>
+    <ul class="clean">
+      <li><b>Cene PV so strmoglavile.</b> Fotovoltaika je danes cenejša na enoto energije kot še pred nekaj leti — segrevanje vode z elektriko iz lastne PV je zdaj konkurenčno starim kolektorjem.</li>
+      <li><b>PV je vsestranska.</b> Kolektor zna le greti vodo. Panel poganja hladilnik, klimo, toplotno črpalko, avto — vse, kar teče na elektriko.</li>
+      <li><b>Manj okvar.</b> Pri PV odpadejo cevi, ventili, obtočna črpalka in tekočina proti zmrzovanju; daljša doba, nižje vzdrževanje.</li>
+      <li><b>Konec net meteringa (1. 1. 2024).</b> Nova samooskrba se obračunava po časovnih blokih in obračunski moči; presežki, oddani v omrežje, se prodajajo poceni. Zato je ključno elektriko <b>porabiti sproti</b> — in prav TČ za vodo je odličen »porabnik« dnevnih presežkov.</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="k">Razčiščenje tvoje skrbi</div>
+      <h4>»Toplotna črpalka = ogromna investicija«? Ne nujno.</h4>
+      <p>Pomembno je ločiti dve povsem različni napravi, ki se pogosto zamenjujeta:</p>
+      <div class="split">
+        <div class="box cheap">
+          <div class="lbl">◆ Sanitarna TČ — samo voda</div>
+          <div class="amt num">800–1.500 €</div>
+          <small>Grelnik z vgrajeno mini toplotno črpalko. Za segrevanje vode porabi ~4× manj elektrike kot navadni grelec. Povračilo 6–7 let.</small>
+        </div>
+        <div class="box pricey">
+          <div class="lbl">◆ Ogrevalna TČ — cela hiša</div>
+          <div class="amt num">8.000–15.000 €+</div>
+          <small>Zrak/voda ali zemlja/voda za ogrevanje celotne hiše. To je »velika« investicija, na katero verjetno misliš — a za samo toplo vodo je ne potrebuješ.</small>
+        </div>
+      </div>
+    </div>
+
+    <h4>Kdaj se kolektorji še vedno splačajo</h4>
+    <ul class="clean water">
+      <li><b>Visoka in stalna poraba tople vode</b> (velika družina, dodatna kopalnica) — termika je tu izjemno učinkovita.</li>
+      <li><b>Že obstoječa napeljava</b> ali zalogovnik z ustreznim priključkom — razširitev je poceni.</li>
+      <li><b>Streha/lega ne dopušča PV</b> (senca, majhna površina, spomeniško varstvo), tople vode pa rabiš veliko.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <!-- PART B -->
+  <section>
+    <div class="part-label"><span class="dot" style="background:var(--water)"></span>Del B — mikro / balkonska skala</div>
+    <h2>Par jurjev ali manj, za na balkon</h2>
+    <p class="sub">Tu ni prave dileme: fotovoltaika kot vtična (plug-in) balkonska elektrarna zmaga, kolektor odpade.</p>
+
+    <div class="tiles">
+      <div class="tile">
+        <div class="t-lbl">Cena kompleta</div>
+        <div class="t-val num">400–850 €</div>
+        <small>panel + mikroinverter + kabel + nosilci (600–800 W)</small>
+      </div>
+      <div class="tile">
+        <div class="t-lbl">Letna proizvodnja</div>
+        <div class="t-val num">~0,7 MWh</div>
+        <small>pri 600 W · pokrije ~15 % porabe gospodinjstva</small>
+      </div>
+      <div class="tile">
+        <div class="t-lbl">Prihranek / leto</div>
+        <div class="t-val num">55–125 €</div>
+        <small>pri 0,16–0,20 €/kWh, ob sprotni porabi</small>
+      </div>
+      <div class="tile">
+        <div class="t-lbl">Povračilo</div>
+        <div class="t-val num">4–8 let</div>
+        <small>brez baterije hitreje; z 2 kWh baterijo 6–10 let</small>
+      </div>
+    </div>
+
+    <div class="legal">
+      <div class="k">Pravni okvir — Slovenija</div>
+      <h4>Ni dovoljenj, a prijava je obvezna</h4>
+      <ul>
+        <li><b>Ni gradbenih dovoljenj ali soglasij</b> — priklop v navadno vtičnico.</li>
+        <li><b>Obvezna prijava distributerju ~14 dni pred vklopom</b> — s številko merilnega mesta, izjavo o skladnosti naprave in navodili za montažo.</li>
+        <li><b>Oddajanje v omrežje maks. 600 W</b>, skupna moč naprave maks. 800 W.</li>
+      </ul>
+    </div>
+
+    <h4>Zakaj kolektor (in »mešano«) na balkonu odpade</h4>
+    <ul class="clean water">
+      <li><b>Termika ni »plug &amp; play«.</b> Kolektor rabi zalogovnik, obtočno črpalko in napeljavo v vodni sistem stanovanja — na balkonu praktično neizvedljivo, za najemnika pa nemogoče.</li>
+      <li><b>Slabo razmerje cena/izkoristek</b> na tako majhni površini.</li>
+      <li>Ker termična stran odpade, <b>»mešani« sistem nima smisla</b> — vsak evro je bolje vložen v še en panel.</li>
+    </ul>
+
+    <h4>Praktičen nasvet</h4>
+    <ul class="clean">
+      <li><b>1–2 panela</b> obrnjena čim bolj proti jugu/zahodu; balkonska ograja proti soncu je idealna.</li>
+      <li><b>Dobiček nastane le ob sprotni porabi</b> — panel se najbolj splača, če je čez dan doma stalna bazna poraba (hladilnik, zamrzovalnik, router, standby naprave).</li>
+      <li><b>Baterijo dodaj le, če je dnevna poraba nizka.</b> Podvoji strošek in podaljša povračilo; brez nje ostane hitrejše.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <!-- Okviren izračun -->
+  <section>
+    <h2>Okviren izračun povračila</h2>
+    <p class="sub">Груbe številke za 4-člansko gospodinjstvo (topla voda ~3.000 kWh/leto, elektrika 0,20 €/kWh). Realno odvisno od porabe, lege in cen.</p>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="water"><span class="cat">Voda</span><span class="name">Kolektorji</span></th>
+            <th class="solar"><span class="cat">Elektrika</span><span class="name">PV 6 kW</span></th>
+            <th class="combo"><span class="cat">Balkon</span><span class="name">Balkonska PV</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Neto strošek (po subv.)</th>
+            <td><span class="num">~2.500–4.000 €</span></td>
+            <td><span class="num">~6.000–9.500 €</span></td>
+            <td><span class="num">~400–850 €</span></td>
+          </tr>
+          <tr>
+            <th>Prihranek / leto</th>
+            <td><span class="num">~400–480 €</span><small>vs. el. grelec</small></td>
+            <td><span class="num">~800–1.200 €</span><small>ob dobri lastni rabi</small></td>
+            <td><span class="num">~55–125 €</span></td>
+          </tr>
+          <tr>
+            <th>Povračilo</th>
+            <td><span class="num">~6–8 let</span></td>
+            <td><span class="num">~7–9 let</span></td>
+            <td><span class="num">~4–8 let</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- Sources -->
+  <div class="sources">
+    <h4>Viri</h4>
+    <div class="src-grid">
+      <a href="https://www.varcevanje-energije.si/fotovoltaicne-elektrarne/soncna-elektrarna-izracun-donosnosti/" target="_blank" rel="noopener"><span class="dom">varcevanje-energije.si</span><span>Sončna elektrarna: cena, subvencije in donos (2026); termosolar vs PV; sanitarna TČ</span></a>
+      <a href="https://soncnelektrarne.si/soncne-elektrarne-v-sloveniji-2025-kaj-morate-vedeti-da-boste-izkoristili-priloznost/" target="_blank" rel="noopener"><span class="dom">soncnelektrarne.si</span><span>Sončne elektrarne v Sloveniji 2025 — izkoristki in povračilo</span></a>
+      <a href="https://www.zps.si/novice/soncne-elektrarne-konec-leta-2023-nov-nacin-obracunavanja-omreznine-2022-06-02" target="_blank" rel="noopener"><span class="dom">zps.si</span><span>Nov način obračunavanja omrežnine / konec net meteringa</span></a>
+      <a href="https://www.gen-isonce.si/novice/soncne-elektrarne-in-net-metering/" target="_blank" rel="noopener"><span class="dom">gen-isonce.si</span><span>Sončne elektrarne in net metering — kaj velja po 2024</span></a>
+      <a href="https://www.energetika-portal.si/nc/novica/n/cene-elektricne-energije-na-maloprodajnem-trgu-za-leto-2025/" target="_blank" rel="noopener"><span class="dom">energetika-portal.si</span><span>Cene električne energije na maloprodajnem trgu 2025</span></a>
+      <a href="https://elektro-zibret.si/blog/subvencije-soncna-elektrarna-2026/" target="_blank" rel="noopener"><span class="dom">elektro-zibret.si</span><span>Subvencije za sončno elektrarno 2026 (Borzen): do 675 €/kW</span></a>
+      <a href="https://www.mojmojster.net/clanek/117/Soncni_kolektorji_investicija_za_prihodnost" target="_blank" rel="noopener"><span class="dom">mojmojster.net</span><span>Solarni sistem / sončni kolektorji — cene in povračilo</span></a>
+      <a href="https://www.zurnal24.si/pod-streho/varcna-hisa/balkonska-soncna-elektrarna-splaca-se-pod-temi-pogoji-405054" target="_blank" rel="noopener"><span class="dom">zurnal24.si</span><span>Balkonska sončna elektrarna — cena, vračilo, pogoji</span></a>
+      <a href="https://www.mojpametnidom.si/blog/solarne-elektrarne/" target="_blank" rel="noopener"><span class="dom">mojpametnidom.si</span><span>Balkonske elektrarne — proizvodnja, prihranek, zakonodaja</span></a>
+      <a href="https://shop.ece.si/katalog/dom/solarni-paneli-in-dodatna-oprema/19201-balkonska-soncna-elektrarna-solarunit-800w" target="_blank" rel="noopener"><span class="dom">shop.ece.si</span><span>Balkonska sončna elektrarna 800 W — cena kompleta</span></a>
+    </div>
+    <p class="disclaimer">Številke so okvirne, zbrane iz javno dostopnih slovenskih virov (2025/2026) in namenjene primerjavi velikostnih redov, ne kot ponudba. Dejansko povračilo je odvisno od tvoje porabe, lege in orientacije, izbranega izvajalca, aktualnih cen elektrike ter pogojev subvencij (Borzen za PV, Eko sklad za kolektorje in TČ). Za konkreten sistem pridobi uradno ponudbo in preveri veljavne razpise.</p>
+  </div>
+
+</div>
