@@ -1,1 +1,3 @@
-# k1ngju.github.io-
+# k1ngju.github.io
+
+Here I be hosting all my silly stuff.
