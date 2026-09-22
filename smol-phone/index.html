@@ -1,0 +1,822 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Small Phone Field Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --paper:#eef0f2;
+    --surface:#ffffff;
+    --surface-2:#f6f8f9;
+    --ink:#14171c;
+    --ink-soft:#3d434e;
+    --muted:#6b7280;
+    --line:#d9dde2;
+    --line-strong:#c2c8cf;
+    --accent:#146074;      /* petrol / instrument */
+    --accent-soft:#e2eef1;
+    --accent-ink:#0e4b5c;
+    --good:#2f7a53;
+    --good-bg:#e3efe8;
+    --ok:#9a6a12;
+    --ok-bg:#f3ead4;
+    --weak:#a2402a;
+    --weak-bg:#f2e0da;
+    --bar-track:#e4e8ec;
+    --shadow:0 1px 2px rgba(20,23,28,.05), 0 8px 24px rgba(20,23,28,.06);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --paper:#0d1014;
+      --surface:#161a20;
+      --surface-2:#1c222a;
+      --ink:#e8ebef;
+      --ink-soft:#c3c9d1;
+      --muted:#8b93a0;
+      --line:#2a313a;
+      --line-strong:#39424d;
+      --accent:#4bb4cd;
+      --accent-soft:#12313a;
+      --accent-ink:#8fd6e6;
+      --good:#5cbe8a;
+      --good-bg:#12302270;
+      --ok:#d6a53f;
+      --ok-bg:#33290f70;
+      --weak:#e08a70;
+      --weak-bg:#3a1f1770;
+      --bar-track:#252c35;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0d1014;
+    --surface:#161a20;
+    --surface-2:#1c222a;
+    --ink:#e8ebef;
+    --ink-soft:#c3c9d1;
+    --muted:#8b93a0;
+    --line:#2a313a;
+    --line-strong:#39424d;
+    --accent:#4bb4cd;
+    --accent-soft:#12313a;
+    --accent-ink:#8fd6e6;
+    --good:#5cbe8a;
+    --good-bg:#12302270;
+    --ok:#d6a53f;
+    --ok-bg:#33290f70;
+    --weak:#e08a70;
+    --weak-bg:#3a1f1770;
+    --bar-track:#252c35;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:0}
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace}
+  h1,h2,h3{font-family:"Archivo", system-ui, sans-serif;text-wrap:balance;line-height:1.08;margin:0}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:500;
+  }
+
+  /* ---- masthead ---- */
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:22px;padding-block:34px 30px}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  h1{font-size:clamp(2rem,5vw,3.15rem);font-weight:800;letter-spacing:-.02em;font-stretch:112%}
+  .sub{color:var(--ink-soft);font-size:1.02rem;max-width:60ch;margin-top:10px}
+  .theme-btn{
+    font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.06em;
+    background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line-strong);
+    border-radius:999px;padding:7px 13px;cursor:pointer;white-space:nowrap;
+  }
+  .theme-btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+
+  .verdict{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  .verdict-card{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;display:flex;flex-direction:column;gap:5px;
+  }
+  .verdict-card.lead{border-color:var(--accent);background:var(--accent-soft)}
+  .verdict-card .tag{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .verdict-card.lead .tag{color:var(--accent-ink)}
+  .verdict-card .name{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.15rem}
+  .verdict-card .why{font-size:.9rem;color:var(--ink-soft)}
+  .verdict-card .price{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.92rem;margin-top:2px}
+
+  /* ---- sections ---- */
+  section{padding-block:38px}
+  .section-head{display:flex;flex-direction:column;gap:6px;margin-bottom:22px;max-width:70ch}
+  h2{font-size:1.55rem;font-weight:700;letter-spacing:-.01em}
+  .lede{color:var(--ink-soft);font-size:1rem}
+  p{margin:0 0 12px}
+  .prose{max-width:68ch;color:var(--ink-soft)}
+  .prose strong{color:var(--ink);font-weight:600}
+
+  /* ---- size reality ---- */
+  .sizes{display:flex;flex-direction:column;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+  .size-row{display:grid;grid-template-columns:130px 1fr 54px;align-items:center;gap:12px}
+  .size-row .lbl{font-size:.86rem;color:var(--ink-soft)}
+  .size-row .val{font-family:"IBM Plex Mono",monospace;font-size:.82rem;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  .size-bar{height:12px;border-radius:6px;background:var(--bar-track);position:relative;overflow:hidden}
+  .size-bar > span{position:absolute;inset:0 auto 0 0;border-radius:6px}
+  .size-row.you .lbl{color:var(--weak);font-weight:600}
+  .size-row.you .size-bar > span{background:var(--weak)}
+  .size-row.pick .lbl{color:var(--accent-ink);font-weight:600}
+  .size-row.pick .size-bar > span{background:var(--accent)}
+  .size-row.neutral .size-bar > span{background:var(--line-strong)}
+  .size-row.big .size-bar > span{background:var(--ok)}
+  .size-note{font-size:.8rem;color:var(--muted);margin-top:4px}
+
+  /* ---- tier + phone cards ---- */
+  .tier{margin-bottom:30px}
+  .tier-label{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .tier-label h3{font-size:1.12rem;font-weight:700}
+  .tier-label .tier-tag{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .phone{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);
+  }
+  .phone.hero{border-color:var(--accent);border-width:1.5px}
+  .phone-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .phone .pname{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.14rem;letter-spacing:-.01em}
+  .phone .pmeta{font-family:"IBM Plex Mono",monospace;font-size:.76rem;color:var(--muted);margin-top:3px}
+  .badge{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px;white-space:nowrap;font-weight:500}
+  .badge.pick{background:var(--accent);color:#fff}
+  :root[data-theme="dark"] .badge.pick{color:#08171b}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .badge.pick{color:#08171b}}
+  .badge.value{background:var(--good-bg);color:var(--good)}
+  .badge.note{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+
+  .specrow{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:.74rem;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .chip b{color:var(--ink);font-weight:600}
+  .phone p{font-size:.9rem;color:var(--ink-soft);margin:0}
+  .pl{display:flex;gap:8px;font-size:.85rem;align-items:flex-start}
+  .pl .k{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);flex:0 0 42px;padding-top:2px}
+  .pl.plus .k{color:var(--good)}
+  .pl.minus .k{color:var(--weak)}
+  .pl .v{color:var(--ink-soft)}
+
+  /* ---- table ---- */
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:760px;font-size:.88rem}
+  thead th{
+    font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);text-align:left;font-weight:500;padding:13px 14px;border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;background:var(--surface-2);position:sticky;top:0;
+  }
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.you td{background:var(--weak-bg)}
+  tbody tr.pickrow td{background:var(--accent-soft)}
+  .t-name{font-weight:600;color:var(--ink);white-space:nowrap}
+  .t-sub{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--muted);display:block;margin-top:2px;font-weight:400}
+  td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .price-cell{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .over{color:var(--weak)}
+  .perf{display:flex;align-items:center;gap:8px;min-width:120px}
+  .perf .meter{flex:1;height:8px;border-radius:5px;background:var(--bar-track);overflow:hidden;min-width:56px}
+  .perf .meter > span{display:block;height:100%;border-radius:5px;background:var(--accent)}
+  .perf .meter.lowp > span{background:var(--weak)}
+  .perf .pn{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .fit{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.04em;padding:4px 9px;border-radius:999px;white-space:nowrap;font-weight:500;display:inline-block}
+  .fit.great{background:var(--good-bg);color:var(--good)}
+  .fit.ok{background:var(--ok-bg);color:var(--ok)}
+  .fit.meh{background:var(--weak-bg);color:var(--weak)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:.78rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%}
+
+  .callout{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:16px 18px;margin-top:8px}
+  .callout h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+  .callout p{font-size:.92rem}
+
+  footer{border-top:1px solid var(--line);padding-block:26px 40px;color:var(--muted);font-size:.82rem}
+  footer a{color:var(--accent-ink)}
+  .foot-note{max-width:70ch}
+
+  @media (max-width:720px){
+    .verdict{grid-template-columns:1fr}
+    .cards{grid-template-columns:1fr}
+    .size-row{grid-template-columns:96px 1fr 46px;gap:9px}
+  }
+</style>
+
+<header>
+  <div class="wrap masthead">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">Buyer's field guide · Slovenia · Sept 2026</div>
+        <h1>The small, cheap, un-bloated phone</h1>
+        <p class="sub">You're not wrong: silicon got ~10× faster while software ate the gains. The fix isn't the most expensive phone — it's a decent chip, 8&nbsp;GB of RAM, and clean-ish software, in the smallest body that still ships in 2026.</p>
+      </div>
+      <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle colour theme">◐ theme</button>
+    </div>
+
+    <div class="verdict">
+      <div class="verdict-card lead">
+        <span class="tag">Buy this</span>
+        <span class="name">Motorola Edge&nbsp;60 Neo</span>
+        <span class="why">6.36" — the smallest genuinely-good phone still sold new. Fast Dimensity 7400, near-stock Android, in budget.</span>
+        <span class="price mono">≈ 300–330 €</span>
+      </div>
+      <div class="verdict-card">
+        <span class="tag">Save money</span>
+        <span class="name">Motorola Edge&nbsp;50 Neo</span>
+        <span class="why">Same 6.36" body, last year's chip that's still ~2× your A15. Best €/smoothness here.</span>
+        <span class="price mono">≈ 250–290 €</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">The honest constraint</div>
+      <h2>Small and cheap barely coexist anymore</h2>
+    </div>
+    <div class="prose">
+      <p>Here's the trap your search keeps hitting. The phones that are <strong>actually small</strong> (6.1–6.2") are old flagships — Galaxy S23, the discontinued Asus Zenfone — and they hold their price near <strong>450–500&nbsp;€</strong>. The phones that are <strong>actually cheap</strong> (under 300&nbsp;€) are all <strong>6.5–6.9" slabs</strong> — the Redmi 16 you flagged, the whole Galaxy A-line, every Redmi Note. There is almost nothing that is both.</p>
+      <p>The one real escape hatch is the <strong>6.36" class</strong> — mainly Motorola's Edge Neo line. It's meaningfully narrower than your current A15 (6.5"), light (~174&nbsp;g), and lands at 250–330&nbsp;€ with a chip that will crush Discord + YouTube&nbsp;ReVanced + Gmail without breaking a sweat. That's why it's the pick. Below is where every candidate falls on the two axes you actually care about.</p>
+    </div>
+
+    <div class="sizes" style="margin-top:8px" role="img" aria-label="Screen size comparison across candidate phones">
+      <div class="size-row you">
+        <span class="lbl">Your A15 5G</span>
+        <div class="size-bar"><span style="width:79%"></span></div>
+        <span class="val">6.50"</span>
+      </div>
+      <div class="size-row neutral">
+        <span class="lbl">Zenfone 10</span>
+        <div class="size-bar"><span style="width:57%"></span></div>
+        <span class="val">5.90"</span>
+      </div>
+      <div class="size-row neutral">
+        <span class="lbl">Galaxy S23</span>
+        <div class="size-bar"><span style="width:64%"></span></div>
+        <span class="val">6.10"</span>
+      </div>
+      <div class="size-row neutral">
+        <span class="lbl">Xperia 10 VI</span>
+        <div class="size-bar"><span style="width:64%"></span></div>
+        <span class="val">6.10"</span>
+      </div>
+      <div class="size-row neutral">
+        <span class="lbl">Pixel 9a</span>
+        <div class="size-bar"><span style="width:71%"></span></div>
+        <span class="val">6.30"</span>
+      </div>
+      <div class="size-row pick">
+        <span class="lbl">Edge 50 / 60 Neo</span>
+        <div class="size-bar"><span style="width:73%"></span></div>
+        <span class="val">6.36"</span>
+      </div>
+      <div class="size-row big">
+        <span class="lbl">Galaxy A36 / A17</span>
+        <div class="size-bar"><span style="width:88%"></span></div>
+        <span class="val">6.70"</span>
+      </div>
+      <div class="size-row big">
+        <span class="lbl">CMF 2 Pro / Nothing 3a</span>
+        <div class="size-bar"><span style="width:92%"></span></div>
+        <span class="val">6.77"</span>
+      </div>
+      <div class="size-row big">
+        <span class="lbl">Redmi 16 (your last resort)</span>
+        <div class="size-bar"><span style="width:100%"></span></div>
+        <span class="val">6.90"</span>
+      </div>
+      <p class="size-note">Diagonal in inches. Bars scaled 5.7"→7.0". Your accent picks sit ~2&nbsp;mm narrower than the A15 — noticeably better in a small hand, without falling off the “new phone” cliff.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">The shortlist · 11 phones</div>
+      <h2>Grouped by what you'd be trading off</h2>
+      <p class="lede">Every price is an approximate Slovenian street price (ceneje.si) as of Sept 2026 — check the live figure before buying, budget phones move fast.</p>
+    </div>
+
+    <!-- TIER 1 -->
+    <div class="tier">
+      <div class="tier-label">
+        <h3>The sweet spot</h3>
+        <span class="tier-tag">smaller · modern · in budget</span>
+      </div>
+      <div class="cards">
+
+        <div class="phone hero">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Motorola Edge 60 Neo</div>
+              <div class="pmeta">6.36" pOLED · 120 Hz · 174 g · IP69</div>
+            </div>
+            <span class="badge pick">Top pick</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Dimensity <b>7400</b></span>
+            <span class="chip"><b>8/12</b> GB</span>
+            <span class="chip"><b>5200</b> mAh · 68W</span>
+          </div>
+          <p>The one phone that answers your whole brief at once: narrower than the A15, a chip roughly <strong>2.3× faster</strong>, and Motorola's near-stock Android with barely any bloat. Big battery, water-resistant, will feel instant for your apps for years.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Best size-to-power balance in budget; clean software; huge battery.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">Top of your budget; camera is fine-not-great (you said you don't care).</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Motorola Edge 50 Neo</div>
+              <div class="pmeta">6.36" pOLED · 120 Hz · 171 g · IP68</div>
+            </div>
+            <span class="badge value">Best value</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Dimensity <b>7300</b></span>
+            <span class="chip"><b>8/256</b> GB</span>
+            <span class="chip"><b>4310</b> mAh · 68W</span>
+          </div>
+          <p>Last year's Neo, now discounted. Identical footprint, a chip still comfortably ahead of your A15, and it saves you ~50&nbsp;€. If you want the smallest smooth phone for the least money, this is it.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Cheapest phone here that truly ends the stutter; 5 yrs of updates.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">Smaller battery than the 60; getting harder to find new.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Nothing CMF Phone 2 Pro</div>
+              <div class="pmeta">6.77" AMOLED · 120 Hz · 185 g</div>
+            </div>
+            <span class="badge note">If size relaxes</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Dimensity <b>7300 Pro</b></span>
+            <span class="chip"><b>8/256</b> GB</span>
+            <span class="chip"><b>5000</b> mAh</span>
+          </div>
+          <p>The value darling of 2026 and about the cleanest software outside a Pixel. Only reason it's not higher: it's <strong>big</strong> — bigger than your A15. Great phone, wrong shape for small hands.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Superb price, minimal bloat, distinctive design, long updates.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">6.77" — the exact thing you're trying to escape.</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIER 2 -->
+    <div class="tier">
+      <div class="tier-label">
+        <h3>Actually small</h3>
+        <span class="tier-tag">6.1" or under · you pay for it</span>
+      </div>
+      <div class="cards">
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Samsung Galaxy S23</div>
+              <div class="pmeta">6.10" AMOLED · 120 Hz · 168 g · IP68</div>
+            </div>
+            <span class="badge note">Over budget</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Snapdragon <b>8 Gen 2</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>3900</b> mAh</span>
+          </div>
+          <p>The genuine small-hands answer with real flagship muscle — a 2023 chip that still laps everything else on this page. If "small" is non-negotiable and you can stretch to ~480&nbsp;€, this is the one to stretch for.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Truly compact; ferociously fast; premium build.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">~480 € (well over budget); One UI is the heaviest software here.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Sony Xperia 10 VI</div>
+              <div class="pmeta">6.10" OLED · 60 Hz · 164 g · IP68</div>
+            </div>
+            <span class="badge note">Read the catch</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Snapdragon <b>6 Gen 1</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>3.5mm</b> jack</span>
+          </div>
+          <p>The narrowest, lightest new phone you can buy, with a headphone jack and clean software. But two catches for <em>you</em> specifically: only <strong>60 Hz</strong> and a modest chip — so it may not feel as "buttery" as you're chasing.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Tiniest footprint; light; jack; near-stock Android.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">60 Hz + mid chip = not the smoothness upgrade you want.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Asus Zenfone 10</div>
+              <div class="pmeta">5.90" AMOLED · 144 Hz · 172 g</div>
+            </div>
+            <span class="badge note">Used only</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Snapdragon <b>8 Gen 2</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>4300</b> mAh</span>
+          </div>
+          <p>The last <em>true</em> small flagship — 5.9", one-hand-perfect, flagship silicon. Discontinued, so it's a second-hand play (bazar / eBay). If you love small phones, this is the enthusiast's grail.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Genuinely tiny + flagship-fast; clean ZenUI; jack.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">No new stock; used ~380–450 €; shorter update runway.</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIER 3 -->
+    <div class="tier">
+      <div class="tier-label">
+        <h3>The anti-bloat play</h3>
+        <span class="tier-tag">clean software first · a bit bigger/pricier</span>
+      </div>
+      <div class="cards">
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Google Pixel 9a</div>
+              <div class="pmeta">6.30" OLED · 120 Hz · 186 g · IP68</div>
+            </div>
+            <span class="badge note">Slightly over</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Tensor <b>G4</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>7 yrs</b> updates</span>
+          </div>
+          <p>If your real grievance is <em>bloat</em>, this is the philosophical answer: the cleanest Android there is and <strong>7 years</strong> of updates — buy once, keep it till 2032. 6.3" is only a hair over your ideal.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Zero bloat; longest support of anything here; fast.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">~448 €; Tensor runs warm; not the cheap option.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Google Pixel 8a</div>
+              <div class="pmeta">6.10" OLED · 120 Hz · 188 g · IP67</div>
+            </div>
+            <span class="badge value">Small + clean</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Tensor <b>G3</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>~2031</b> updates</span>
+          </div>
+          <p>The sleeper: a <strong>6.1"</strong> Pixel with clean software and years of support left. Officially discontinued in SI, so hunt second-hand or grey-import — around 300–350&nbsp;€ used it's arguably the best small+clean+cheap combo on the whole list.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Small AND clean AND affordable — the rare triple.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">Not sold new; you'll be buying used.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Nothing Phone (3a)</div>
+              <div class="pmeta">6.77" AMOLED · 120 Hz · 201 g</div>
+            </div>
+            <span class="badge note">If size relaxes</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Snapdragon <b>7s Gen 3</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>5000</b> mAh</span>
+          </div>
+          <p>Clean Nothing OS, strong value, long battery — same story as the CMF but a step up in polish. And the same disqualifier for you: it's a large phone.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Clean software; good value; character.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">Big and heavy (201 g).</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIER 4 -->
+    <div class="tier">
+      <div class="tier-label">
+        <h3>Cheapest that still fixes the lag</h3>
+        <span class="tier-tag">big screens · last resorts</span>
+      </div>
+      <div class="cards">
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Samsung Galaxy A36 5G</div>
+              <div class="pmeta">6.70" AMOLED · 120 Hz · 195 g · IP67</div>
+            </div>
+            <span class="badge note">Big</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Snapdragon <b>6 Gen 3</b></span>
+            <span class="chip"><b>8/128</b> GB</span>
+            <span class="chip"><b>5000</b> mAh</span>
+          </div>
+          <p>If you'd tolerate Samsung again: ~2× the A15's speed and 6 years of updates for ~270&nbsp;€. But it's <em>bigger</em> than what you have now, and it's still One UI. Note the A17 (the direct A15 successor) is barely faster — don't buy sideways.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Cheap; long support; familiar Samsung.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">6.7" and still bloated — the opposite of your brief.</span></div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-top">
+            <div>
+              <div class="pname">Redmi Note 15 / Poco X-class</div>
+              <div class="pmeta">~6.67" AMOLED · 120 Hz · ~190 g</div>
+            </div>
+            <span class="badge note">Bloat warning</span>
+          </div>
+          <div class="specrow">
+            <span class="chip">Dimensity/SD <b>mid</b></span>
+            <span class="chip"><b>8/256</b> GB</span>
+            <span class="chip"><b>~220–260</b> €</span>
+          </div>
+          <p>The rawest specs-per-euro on the market. The catch is exactly your pet peeve: <strong>HyperOS ships with ads and pre-installed junk</strong>. Powerful, but you'd be fighting the software to de-bloat it.</p>
+          <div class="pl plus"><span class="k">for</span><span class="v">Most hardware per euro; big battery.</span></div>
+          <div class="pl minus"><span class="k">vs</span><span class="v">Ads/bloat in the OS; large body.</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">The summary you asked for</div>
+      <h2>All 11, side by side</h2>
+      <p class="lede">Your A15 is pinned at the top as the baseline. "Speed" is a rough AnTuTu-based index; the bar is what it feels like relative to a current flagship.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Phone</th>
+            <th>Screen</th>
+            <th>Speed vs your apps</th>
+            <th>RAM / Battery</th>
+            <th>~Price (SI)</th>
+            <th>Fit for you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="you">
+            <td class="t-name">Samsung Galaxy A15 5G<span class="t-sub">your current phone</span></td>
+            <td class="num">6.5"</td>
+            <td><div class="perf"><div class="meter lowp"><span style="width:27%"></span></div><span class="pn">~410k</span></div></td>
+            <td class="num">4–6 / 5000</td>
+            <td class="price-cell">— owned</td>
+            <td><span class="fit meh">the problem</span></td>
+          </tr>
+          <tr class="pickrow">
+            <td class="t-name">Motorola Edge 60 Neo<span class="t-sub">top pick · Dimensity 7400</span></td>
+            <td class="num">6.36"</td>
+            <td><div class="perf"><div class="meter"><span style="width:64%"></span></div><span class="pn">~965k</span></div></td>
+            <td class="num">8–12 / 5200</td>
+            <td class="price-cell">300–330 €</td>
+            <td><span class="fit great">ideal</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Motorola Edge 50 Neo<span class="t-sub">best value · Dimensity 7300</span></td>
+            <td class="num">6.36"</td>
+            <td><div class="perf"><div class="meter"><span style="width:48%"></span></div><span class="pn">~720k</span></div></td>
+            <td class="num">8 / 4310</td>
+            <td class="price-cell">250–290 €</td>
+            <td><span class="fit great">ideal</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Samsung Galaxy S23<span class="t-sub">SD 8 Gen 2</span></td>
+            <td class="num">6.1"</td>
+            <td><div class="perf"><div class="meter"><span style="width:100%"></span></div><span class="pn">~1.5M</span></div></td>
+            <td class="num">8 / 3900</td>
+            <td class="price-cell over">~480 €</td>
+            <td><span class="fit ok">small, pricey</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Sony Xperia 10 VI<span class="t-sub">SD 6 Gen 1 · 60 Hz</span></td>
+            <td class="num">6.1"</td>
+            <td><div class="perf"><div class="meter lowp"><span style="width:30%"></span></div><span class="pn">~450k</span></div></td>
+            <td class="num">8 / 5000</td>
+            <td class="price-cell">330–380 €</td>
+            <td><span class="fit ok">tiny, but 60 Hz</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Asus Zenfone 10<span class="t-sub">SD 8 Gen 2 · used</span></td>
+            <td class="num">5.9"</td>
+            <td><div class="perf"><div class="meter"><span style="width:100%"></span></div><span class="pn">~1.5M</span></div></td>
+            <td class="num">8 / 4300</td>
+            <td class="price-cell">~380–450 €</td>
+            <td><span class="fit ok">grail, used</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Google Pixel 9a<span class="t-sub">Tensor G4 · 7 yr updates</span></td>
+            <td class="num">6.3"</td>
+            <td><div class="perf"><div class="meter"><span style="width:77%"></span></div><span class="pn">~1.15M</span></div></td>
+            <td class="num">8 / 5100</td>
+            <td class="price-cell over">~448 €</td>
+            <td><span class="fit ok">cleanest, pricey</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Google Pixel 8a<span class="t-sub">Tensor G3 · used</span></td>
+            <td class="num">6.1"</td>
+            <td><div class="perf"><div class="meter"><span style="width:63%"></span></div><span class="pn">~950k</span></div></td>
+            <td class="num">8 / 4492</td>
+            <td class="price-cell">~300–350 €</td>
+            <td><span class="fit great">small+clean</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Nothing CMF Phone 2 Pro<span class="t-sub">Dimensity 7300 Pro</span></td>
+            <td class="num">6.77"</td>
+            <td><div class="perf"><div class="meter"><span style="width:49%"></span></div><span class="pn">~730k</span></div></td>
+            <td class="num">8 / 5000</td>
+            <td class="price-cell">300–350 €</td>
+            <td><span class="fit ok">great but big</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Nothing Phone (3a)<span class="t-sub">SD 7s Gen 3</span></td>
+            <td class="num">6.77"</td>
+            <td><div class="perf"><div class="meter"><span style="width:55%"></span></div><span class="pn">~820k</span></div></td>
+            <td class="num">8 / 5000</td>
+            <td class="price-cell">~300 €</td>
+            <td><span class="fit ok">clean but big</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Samsung Galaxy A36 5G<span class="t-sub">SD 6 Gen 3</span></td>
+            <td class="num">6.7"</td>
+            <td><div class="perf"><div class="meter"><span style="width:56%"></span></div><span class="pn">~845k</span></div></td>
+            <td class="num">8 / 5000</td>
+            <td class="price-cell">260–290 €</td>
+            <td><span class="fit meh">big + One UI</span></td>
+          </tr>
+          <tr>
+            <td class="t-name">Redmi Note 15 / Poco<span class="t-sub">mid-tier · HyperOS ads</span></td>
+            <td class="num">6.67"</td>
+            <td><div class="perf"><div class="meter"><span style="width:47%"></span></div><span class="pn">~700k</span></div></td>
+            <td class="num">8 / 5500</td>
+            <td class="price-cell">220–260 €</td>
+            <td><span class="fit meh">big + bloat</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--good)"></span> ideal fit</span>
+      <span><span class="dot" style="background:var(--ok)"></span> good, with a caveat</span>
+      <span><span class="dot" style="background:var(--weak)"></span> works against your brief</span>
+      <span class="mono">· speed index ≈ AnTuTu 11, rounded</span>
+    </div>
+  </section>
+
+  <section>
+    <style>
+      .batt{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+      .batt-row{display:grid;grid-template-columns:172px 1fr 92px;align-items:center;gap:12px}
+      .batt-row .bn{display:flex;flex-direction:column;line-height:1.25}
+      .batt-row .bn b{font-size:.9rem;font-weight:600;color:var(--ink)}
+      .batt-row .bn small{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+      .batt-bar{height:14px;border-radius:7px;background:var(--bar-track);position:relative;overflow:hidden}
+      .batt-bar > span{position:absolute;inset:0 auto 0 0;border-radius:7px;background:var(--accent)}
+      .batt-bar.est > span{background:repeating-linear-gradient(135deg,var(--accent) 0 7px,color-mix(in srgb,var(--accent) 55%,transparent) 7px 14px)}
+      .batt-row.base .bn b{color:var(--weak)}
+      .batt-row.base .batt-bar > span{background:var(--weak)}
+      .batt-row .bv{font-family:"IBM Plex Mono",monospace;font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+      .batt-row .bv em{font-style:normal;color:var(--muted);font-size:.66rem;display:block;letter-spacing:.02em}
+      .batt-scale{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--muted);margin-top:6px;padding-left:184px}
+      .batt-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:.78rem;color:var(--muted)}
+      .batt-legend span{display:inline-flex;align-items:center;gap:7px}
+      .swatch{width:22px;height:10px;border-radius:3px;background:var(--accent)}
+      .swatch.est{background:repeating-linear-gradient(135deg,var(--accent) 0 5px,color-mix(in srgb,var(--accent) 55%,transparent) 5px 10px)}
+      .swatch.base{background:var(--weak)}
+      @media (max-width:720px){
+        .batt-row{grid-template-columns:120px 1fr 74px;gap:9px}
+        .batt-scale{padding-left:129px}
+      }
+    </style>
+    <div class="section-head">
+      <div class="eyebrow">Endurance · measured, not just mAh</div>
+      <h2>Battery: the one thing your A15 already gets right</h2>
+      <p class="lede">The bar is real-world endurance — GSMArena's Active Use Score, hours of mixed screen-on use — which folds in the chip/software efficiency raw mAh hides. Capacity and charge speed are on each row. Sorted longest-lasting first.</p>
+    </div>
+
+    <div class="batt" role="img" aria-label="Battery endurance comparison, longest first">
+      <div class="batt-row">
+        <span class="bn"><b>Motorola Edge 60 Neo</b><small>5200 mAh · 68W</small></span>
+        <div class="batt-bar est"><span style="width:94%"></span></div>
+        <span class="bv">~15:00<em>est.</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Redmi Note 15 / Poco</b><small>~5500 mAh · 45W+</small></span>
+        <div class="batt-bar est"><span style="width:91%"></span></div>
+        <span class="bv">~14:30<em>est.</em></span>
+      </div>
+      <div class="batt-row base">
+        <span class="bn"><b>Samsung Galaxy A15 5G</b><small>5000 mAh · 25W · yours</small></span>
+        <div class="batt-bar"><span style="width:91%"></span></div>
+        <span class="bv">14:31<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Nothing CMF Phone 2 Pro</b><small>5000 mAh · 33W</small></span>
+        <div class="batt-bar"><span style="width:89%"></span></div>
+        <span class="bv">~14:12<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Sony Xperia 10 VI</b><small>5000 mAh · 21W</small></span>
+        <div class="batt-bar"><span style="width:88%"></span></div>
+        <span class="bv">~14:00<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Nothing Phone (3a)</b><small>5000 mAh · 50W</small></span>
+        <div class="batt-bar"><span style="width:85%"></span></div>
+        <span class="bv">13:32<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Google Pixel 9a</b><small>5100 mAh · 23W</small></span>
+        <div class="batt-bar est"><span style="width:84%"></span></div>
+        <span class="bv">~13:30<em>est.</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Motorola Edge 50 Neo</b><small>4310 mAh · 68W</small></span>
+        <div class="batt-bar"><span style="width:84%"></span></div>
+        <span class="bv">13:29<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Samsung Galaxy A36 5G</b><small>5000 mAh · 45W</small></span>
+        <div class="batt-bar est"><span style="width:81%"></span></div>
+        <span class="bv">~13:00<em>est.</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Google Pixel 8a</b><small>4492 mAh · 18W</small></span>
+        <div class="batt-bar"><span style="width:75%"></span></div>
+        <span class="bv">~12:00<em>measured</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Asus Zenfone 10</b><small>4300 mAh · 30W</small></span>
+        <div class="batt-bar est"><span style="width:72%"></span></div>
+        <span class="bv">~11:30<em>est.</em></span>
+      </div>
+      <div class="batt-row">
+        <span class="bn"><b>Samsung Galaxy S23</b><small>3900 mAh · 25W</small></span>
+        <div class="batt-bar"><span style="width:72%"></span></div>
+        <span class="bv">11:30<em>measured</em></span>
+      </div>
+      <div class="batt-scale"><span>0h</span><span>4h</span><span>8h</span><span>12h</span><span>16h</span></div>
+    </div>
+    <div class="batt-legend">
+      <span><span class="swatch"></span> measured (GSMArena Active Use)</span>
+      <span><span class="swatch est"></span> estimated (not yet lab-tested / spec-based)</span>
+      <span><span class="swatch base"></span> your A15 baseline</span>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>The takeaway: battery isn't what's failing you</h3>
+      <p>Your A15 posts <strong>14.5 hours</strong> of real endurance — genuinely good, and better than the Galaxy S23 or the Pixels. So the "constantly dying" feeling is almost certainly a worn-out cell and the chip thrashing under load, <em>not</em> a small battery. Every green pick here matches or beats it on longevity, and the two things that actually change day-to-day are: <strong>charge speed</strong> — the Motorola picks refill in ~40&nbsp;min at 68W vs the A15's ~1h10 and the Xperia/Pixel-8a's painful 1h40–1h53 — and a <strong>fresh battery</strong> that hasn't lost 15% of its capacity to two years of cycles. Net: don't pick on endurance (they're all fine), pick on size + smoothness, and enjoy the faster charging as a bonus.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="callout">
+      <h3>If I had to hand you one decision</h3>
+      <p><strong>Buy the Motorola Edge 60 Neo</strong> (or the 50 Neo to save ~50&nbsp;€). It's the only thing that satisfies small-ish + cheap + smooth + low-bloat simultaneously, and either one will feel like a different universe from the A15. <strong>Only override that if one axis is absolute:</strong> if "tiny" truly outranks everything → hunt a used Pixel&nbsp;8a (6.1", clean) or stretch to a Galaxy&nbsp;S23; if "never see bloat again" outranks everything → Pixel&nbsp;9a and keep it seven years. And whatever you buy, your ReVanced/Discord/office load is light enough that any phone on the green rows will stay smooth well into the 2030s.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap foot-note">
+    <p>Prices are approximate Slovenian street estimates (Sept 2026) — confirm live figures on <a href="https://www.ceneje.si" target="_blank" rel="noopener">ceneje.si</a> before buying, and check A1 / Telekom / Bigbang / mimovrste stock. Speed index is a rounded AnTuTu-11-style figure for relative feel, not a precise score. Camera, an axis you said you don't care about, is deliberately left out.</p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var btn = document.getElementById('themeToggle');
+    if(!btn) return;
+    var root = document.documentElement;
+    btn.addEventListener('click', function(){
+      var cur = root.getAttribute('data-theme');
+      if(!cur){
+        var darkNow = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        cur = darkNow ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
+
+</body></html>
