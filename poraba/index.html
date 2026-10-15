@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Elektrika naše hiše</title>
+<meta name="description" content="Analiza 3 let 15-minutnih meritev porabe elektrike hiše s toplotno črpalko in simulacija sončne elektrarne.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<style>
+:root{
+  --bg:#f6f7f4; --color-bg:#f6f7f4; --color-panel:#ffffff; --color-fg:#1c211d; --color-fg-muted:#5d665f;
+  --color-border-line:#dde2dc; --color-bad:#c2412d; --color-ok:#2f7a4a; --color-warn:#a8660b;
+  --c1:#1f6f8b; --c2:#e0a21b; --c3:#5b8c3a; --c4:#c2593a; --c5:#8a6fb0; --c6:#3c9d9b;
+  --cds-chart-grid:#e8ebe6; --cds-chart-axis:#b9c0b8; --cds-chart-reference:#8b948c; --cds-chart-muted:#c7cdc6;
+  --cds-surface-popover:#ffffff; --cds-border:#d6dbd4; --cds-text-secondary:#5d665f; --cds-shadow-popover:0 6px 20px rgba(20,30,20,.12);
+  --cds-font-size-caption:.8125rem; --cds-font-size-body:.9375rem; --cds-font-size-heading:1.0625rem; --cds-font-size-title:1.875rem;
+  --cds-font-weight-medium:600; --cds-gap-xs:4px; --cds-gap-sm:8px; --cds-gap-md:16px; --cds-gap-lg:24px; --cds-gap-xl:40px;
+  --cds-pad-xs:6px; --cds-pad-sm:10px; --cds-pad-lg:20px; --cds-radius:10px; --cds-dur-slow:.4s;
+  --font-sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --font-serif:"Newsreader",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --color-bg:#121614; --color-panel:#1b201d; --color-fg:#e7ebe6; --color-fg-muted:#9aa49c; --color-border-line:#2c332e;
+  --color-bad:#ec7a63; --color-ok:#6cc08a; --color-warn:#e3a74a;
+  --c1:#5bb3d1; --c2:#f0bf4f; --c3:#8fc46a; --c4:#ec8a69; --c5:#b59ce0; --c6:#6cc9c6;
+  --cds-chart-grid:#252b27; --cds-chart-axis:#434b45; --cds-chart-reference:#7b857d; --cds-chart-muted:#4a524c;
+  --cds-surface-popover:#222824; --cds-border:#353d37; --cds-text-secondary:#9aa49c; --cds-shadow-popover:0 6px 20px rgba(0,0,0,.45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --color-bg:#121614; --color-panel:#1b201d; --color-fg:#e7ebe6; --color-fg-muted:#9aa49c; --color-border-line:#2c332e;
+  --color-bad:#ec7a63; --color-ok:#6cc08a; --color-warn:#e3a74a;
+  --c1:#5bb3d1; --c2:#f0bf4f; --c3:#8fc46a; --c4:#ec8a69; --c5:#b59ce0; --c6:#6cc9c6;
+  --cds-chart-grid:#252b27; --cds-chart-axis:#434b45; --cds-chart-reference:#7b857d; --cds-chart-muted:#4a524c;
+  --cds-surface-popover:#222824; --cds-border:#353d37; --cds-text-secondary:#9aa49c; --cds-shadow-popover:0 6px 20px rgba(0,0,0,.45); color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--color-fg);font-family:var(--font-sans);font-size:var(--cds-font-size-body);
+  padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.dash-skeleton{color:transparent;background:var(--color-border-line);border-radius:4px}
+.sp .up{color:var(--color-bad)}
+
+.sp{display:flex;flex-direction:column;gap:var(--cds-gap-xl);font-family:var(--font-sans);max-width:76rem;margin-inline:auto}
+.sp .hd{display:flex;flex-direction:column;gap:var(--cds-gap-sm)}
+.sp h1{font-family:var(--font-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;text-wrap:balance}
+.sp .lead{color:var(--color-fg-muted);margin:0;max-width:72ch;line-height:1.5}
+.sp .lead b{font-weight:600;color:var(--color-fg)}
+.sp h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.sp .sec{display:flex;flex-direction:column;gap:var(--cds-gap-md)}
+.sp .sec>p{margin:0;color:var(--color-fg-muted);max-width:72ch;line-height:1.5}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10.5rem),1fr));gap:var(--cds-gap-md)}
+.kpi{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-xs);min-width:0}
+.kpi .l{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.kpi .v{font-family:var(--font-serif);font-weight:400;font-size:var(--cds-font-size-title);font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .s{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.kpi .s .up{color:var(--color-bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24rem),1fr));gap:var(--cds-gap-md)}
+.card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-sm);min-width:0}
+.card h3{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.card .note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:0;line-height:1.45}
+.chart{position:relative;min-height:260px}
+.chart.short{min-height:200px}
+.legend{display:flex;flex-wrap:wrap;gap:var(--cds-gap-md);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.legend span.k{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+.seg{display:inline-flex;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;align-self:flex-start}
+.seg button{font:inherit;font-size:var(--cds-font-size-caption);padding:var(--cds-pad-xs) var(--cds-pad-sm);background:transparent;color:var(--color-fg-muted);border:0;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--color-border-line);color:var(--color-fg)}
+.seg button:focus-visible{outline:2px solid var(--color-fg);outline-offset:-2px}
+.tt{position:absolute;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);pointer-events:none;white-space:nowrap;z-index:2;font-variant-numeric:tabular-nums}
+.tt .tt-h{color:var(--cds-text-secondary)}
+.tt .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.fail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.fail .dot{width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
+.tw{overflow-x:auto}
+.sp table{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-caption);font-variant-numeric:tabular-nums}
+.sp th{text-align:left;font-weight:var(--cds-font-weight-medium);color:var(--color-fg-muted);padding:6px 10px 6px 0;border-bottom:1px solid var(--color-border-line);white-space:nowrap}
+.sp td{padding:7px 10px 7px 0;border-bottom:1px solid var(--color-border-line);vertical-align:top}
+.sp td.n,.sp th.n{text-align:right}
+.sp tr.hl td{font-weight:600}
+.tw table{min-width:34rem}
+#t-ukrepi{min-width:46rem}
+#t-konice{min-width:0}
+.sp td:first-child{white-space:nowrap}
+#t-ukrepi td:first-child{white-space:normal;min-width:9rem}
+.sp td.desc{color:var(--color-fg-muted);min-width:16rem;line-height:1.45}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;border:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption)}
+.ass{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.5;max-width:80ch;margin:0}
+[data-dash-source-state=empty]{color:transparent}
+[data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+window.DATA={"povzetek": [{"kazalnik": "poraba_zadnje_leto_kwh", "vrednost": "21950.0"}, {"kazalnik": "poraba_leto_prej_kwh", "vrednost": "20854.0"}, {"kazalnik": "zimski_delez_pct", "vrednost": "57.0"}, {"kazalnik": "strosek_energija_in_prenos_eur", "vrednost": "3613.0"}, {"kazalnik": "strosek_dogovorjena_moc_eur", "vrednost": "487.0"}, {"kazalnik": "omreznina_12m_eur", "vrednost": "1011.0"}, {"kazalnik": "poletna_nocna_osnova_kw", "vrednost": "0.27"}, {"kazalnik": "max_konica_kw", "vrednost": "14.8"}, {"kazalnik": "dni_nad_12kw", "vrednost": "14.0"}, {"kazalnik": "povprecna_cena_kwh_eur", "vrednost": "0.164"}], "mesecna": [{"mesec": "2023-10", "kwh": "785.7", "max_kw": "10.8", "dni_v_podatkih": "17"}, {"mesec": "2023-11", "kwh": "2461.8", "max_kw": "10.6", "dni_v_podatkih": "30"}, {"mesec": "2023-12", "kwh": "2936.0", "max_kw": "12.4", "dni_v_podatkih": "31"}, {"mesec": "2024-01", "kwh": "3471.2", "max_kw": "13.2", "dni_v_podatkih": "31"}, {"mesec": "2024-02", "kwh": "2211.0", "max_kw": "11.4", "dni_v_podatkih": "29"}, {"mesec": "2024-03", "kwh": "1914.8", "max_kw": "9.6", "dni_v_podatkih": "31"}, {"mesec": "2024-04", "kwh": "1447.2", "max_kw": "10.3", "dni_v_podatkih": "30"}, {"mesec": "2024-05", "kwh": "987.7", "max_kw": "9.0", "dni_v_podatkih": "31"}, {"mesec": "2024-06", "kwh": "807.4", "max_kw": "8.8", "dni_v_podatkih": "30"}, {"mesec": "2024-07", "kwh": "779.6", "max_kw": "9.8", "dni_v_podatkih": "31"}, {"mesec": "2024-08", "kwh": "723.3", "max_kw": "9.7", "dni_v_podatkih": "31"}, {"mesec": "2024-09", "kwh": "988.3", "max_kw": "9.1", "dni_v_podatkih": "30"}, {"mesec": "2024-10", "kwh": "1457.7", "max_kw": "9.4", "dni_v_podatkih": "31"}, {"mesec": "2024-11", "kwh": "2558.9", "max_kw": "11.6", "dni_v_podatkih": "30"}, {"mesec": "2024-12", "kwh": "3099.5", "max_kw": "14.7", "dni_v_podatkih": "31"}, {"mesec": "2025-01", "kwh": "3038.6", "max_kw": "15.5", "dni_v_podatkih": "31"}, {"mesec": "2025-02", "kwh": "2653.4", "max_kw": "14.7", "dni_v_podatkih": "28"}, {"mesec": "2025-03", "kwh": "2037.4", "max_kw": "11.2", "dni_v_podatkih": "31"}, {"mesec": "2025-04", "kwh": "1392.0", "max_kw": "8.9", "dni_v_podatkih": "30"}, {"mesec": "2025-05", "kwh": "1228.9", "max_kw": "8.2", "dni_v_podatkih": "31"}, {"mesec": "2025-06", "kwh": "842.0", "max_kw": "8.2", "dni_v_podatkih": "30"}, {"mesec": "2025-07", "kwh": "850.7", "max_kw": "9.6", "dni_v_podatkih": "31"}, {"mesec": "2025-08", "kwh": "728.9", "max_kw": "8.6", "dni_v_podatkih": "31"}, {"mesec": "2025-09", "kwh": "850.5", "max_kw": "9.6", "dni_v_podatkih": "30"}, {"mesec": "2025-10", "kwh": "1774.2", "max_kw": "10.1", "dni_v_podatkih": "31"}, {"mesec": "2025-11", "kwh": "2534.0", "max_kw": "12.9", "dni_v_podatkih": "30"}, {"mesec": "2025-12", "kwh": "3414.9", "max_kw": "12.1", "dni_v_podatkih": "31"}, {"mesec": "2026-01", "kwh": "4025.0", "max_kw": "14.4", "dni_v_podatkih": "31"}, {"mesec": "2026-02", "kwh": "2487.7", "max_kw": "14.8", "dni_v_podatkih": "28"}, {"mesec": "2026-03", "kwh": "2063.7", "max_kw": "9.8", "dni_v_podatkih": "31"}, {"mesec": "2026-04", "kwh": "1418.6", "max_kw": "9.8", "dni_v_podatkih": "30"}, {"mesec": "2026-05", "kwh": "1104.9", "max_kw": "10.8", "dni_v_podatkih": "31"}, {"mesec": "2026-06", "kwh": "817.7", "max_kw": "9.1", "dni_v_podatkih": "30"}, {"mesec": "2026-07", "kwh": "803.9", "max_kw": "8.3", "dni_v_podatkih": "31"}, {"mesec": "2026-08", "kwh": "784.1", "max_kw": "9.1", "dni_v_podatkih": "31"}, {"mesec": "2026-09", "kwh": "873.4", "max_kw": "9.2", "dni_v_podatkih": "30"}, {"mesec": "2026-10", "kwh": "616.1", "max_kw": "8.3", "dni_v_podatkih": "14"}], "profil": [{"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "0", "kw": "0.63"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "1", "kw": "0.49"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "2", "kw": "0.45"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "3", "kw": "0.37"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "4", "kw": "0.37"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "5", "kw": "0.54"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "6", "kw": "1.11"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "7", "kw": "1.11"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "8", "kw": "0.62"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "9", "kw": "0.76"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "10", "kw": "1.05"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "11", "kw": "1.05"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "12", "kw": "1.01"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "13", "kw": "1.08"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "14", "kw": "1.24"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "15", "kw": "1.73"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "16", "kw": "1.65"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "17", "kw": "1.64"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "18", "kw": "1.78"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "19", "kw": "1.8"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "20", "kw": "1.45"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "21", "kw": "1.57"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "22", "kw": "1.37"}, {"sezona": "Poletje (jun–avg)", "dan": "Delavnik", "ura": "23", "kw": "0.98"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "0", "kw": "0.61"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "1", "kw": "0.51"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "2", "kw": "0.48"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "3", "kw": "0.43"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "4", "kw": "0.35"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "5", "kw": "0.35"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "6", "kw": "0.95"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "7", "kw": "1.6"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "8", "kw": "1.24"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "9", "kw": "0.89"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "10", "kw": "1.39"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "11", "kw": "1.42"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "12", "kw": "1.47"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "13", "kw": "1.68"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "14", "kw": "1.34"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "15", "kw": "1.19"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "16", "kw": "1.33"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "17", "kw": "1.43"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "18", "kw": "1.61"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "19", "kw": "1.53"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "20", "kw": "1.52"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "21", "kw": "1.6"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "22", "kw": "1.29"}, {"sezona": "Poletje (jun–avg)", "dan": "Vikend", "ura": "23", "kw": "0.67"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "0", "kw": "1.76"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "1", "kw": "1.71"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "2", "kw": "1.67"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "3", "kw": "1.64"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "4", "kw": "1.74"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "5", "kw": "1.97"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "6", "kw": "2.47"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "7", "kw": "2.91"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "8", "kw": "2.2"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "9", "kw": "1.82"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "10", "kw": "1.97"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "11", "kw": "1.83"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "12", "kw": "1.9"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "13", "kw": "1.74"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "14", "kw": "1.96"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "15", "kw": "2.14"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "16", "kw": "2.21"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "17", "kw": "2.41"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "18", "kw": "2.7"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "19", "kw": "2.77"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "20", "kw": "2.59"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "21", "kw": "3.13"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "22", "kw": "2.95"}, {"sezona": "Pomlad/jesen", "dan": "Delavnik", "ura": "23", "kw": "2.06"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "0", "kw": "1.69"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "1", "kw": "1.68"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "2", "kw": "1.72"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "3", "kw": "1.75"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "4", "kw": "1.84"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "5", "kw": "1.95"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "6", "kw": "2.05"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "7", "kw": "2.64"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "8", "kw": "2.57"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "9", "kw": "2.85"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "10", "kw": "2.87"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "11", "kw": "2.39"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "12", "kw": "2.5"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "13", "kw": "2.18"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "14", "kw": "2.02"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "15", "kw": "1.95"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "16", "kw": "1.75"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "17", "kw": "1.93"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "18", "kw": "2.09"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "19", "kw": "2.69"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "20", "kw": "2.77"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "21", "kw": "2.95"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "22", "kw": "2.78"}, {"sezona": "Pomlad/jesen", "dan": "Vikend", "ura": "23", "kw": "1.7"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "0", "kw": "3.78"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "1", "kw": "3.63"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "2", "kw": "3.63"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "3", "kw": "3.56"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "4", "kw": "4.07"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "5", "kw": "3.99"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "6", "kw": "4.16"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "7", "kw": "5.18"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "8", "kw": "4.92"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "9", "kw": "4.62"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "10", "kw": "4.99"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "11", "kw": "4.46"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "12", "kw": "4.4"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "13", "kw": "4.18"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "14", "kw": "4.19"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "15", "kw": "4.38"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "16", "kw": "4.96"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "17", "kw": "5.4"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "18", "kw": "5.28"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "19", "kw": "5.02"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "20", "kw": "5.28"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "21", "kw": "5.34"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "22", "kw": "5.14"}, {"sezona": "Zima (dec–feb)", "dan": "Delavnik", "ura": "23", "kw": "4.78"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "0", "kw": "4.09"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "1", "kw": "3.67"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "2", "kw": "3.36"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "3", "kw": "3.1"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "4", "kw": "3.29"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "5", "kw": "3.79"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "6", "kw": "3.53"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "7", "kw": "4.62"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "8", "kw": "4.66"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "9", "kw": "4.82"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "10", "kw": "6.09"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "11", "kw": "5.74"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "12", "kw": "5.87"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "13", "kw": "5.3"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "14", "kw": "4.53"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "15", "kw": "4.97"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "16", "kw": "4.82"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "17", "kw": "5.21"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "18", "kw": "5.19"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "19", "kw": "5.44"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "20", "kw": "4.89"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "21", "kw": "5.29"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "22", "kw": "5.53"}, {"sezona": "Zima (dec–feb)", "dan": "Vikend", "ura": "23", "kw": "5.02"}], "osnova": [{"mesec": "2023-10", "nocna_osnova_kw": "0.37"}, {"mesec": "2023-11", "nocna_osnova_kw": "1.09"}, {"mesec": "2023-12", "nocna_osnova_kw": "1.88"}, {"mesec": "2024-01", "nocna_osnova_kw": "2.12"}, {"mesec": "2024-02", "nocna_osnova_kw": "1.37"}, {"mesec": "2024-03", "nocna_osnova_kw": "0.71"}, {"mesec": "2024-04", "nocna_osnova_kw": "0.39"}, {"mesec": "2024-05", "nocna_osnova_kw": "0.35"}, {"mesec": "2024-06", "nocna_osnova_kw": "0.32"}, {"mesec": "2024-07", "nocna_osnova_kw": "0.31"}, {"mesec": "2024-08", "nocna_osnova_kw": "0.32"}, {"mesec": "2024-09", "nocna_osnova_kw": "0.32"}, {"mesec": "2024-10", "nocna_osnova_kw": "0.48"}, {"mesec": "2024-11", "nocna_osnova_kw": "1.51"}, {"mesec": "2024-12", "nocna_osnova_kw": "1.92"}, {"mesec": "2025-01", "nocna_osnova_kw": "2.08"}, {"mesec": "2025-02", "nocna_osnova_kw": "1.69"}, {"mesec": "2025-03", "nocna_osnova_kw": "0.63"}, {"mesec": "2025-04", "nocna_osnova_kw": "0.44"}, {"mesec": "2025-05", "nocna_osnova_kw": "0.4"}, {"mesec": "2025-06", "nocna_osnova_kw": "0.35"}, {"mesec": "2025-07", "nocna_osnova_kw": "0.35"}, {"mesec": "2025-08", "nocna_osnova_kw": "0.32"}, {"mesec": "2025-09", "nocna_osnova_kw": "0.34"}, {"mesec": "2025-10", "nocna_osnova_kw": "0.69"}, {"mesec": "2025-11", "nocna_osnova_kw": "0.93"}, {"mesec": "2025-12", "nocna_osnova_kw": "1.8"}, {"mesec": "2026-01", "nocna_osnova_kw": "2.49"}, {"mesec": "2026-02", "nocna_osnova_kw": "1.04"}, {"mesec": "2026-03", "nocna_osnova_kw": "0.96"}, {"mesec": "2026-04", "nocna_osnova_kw": "0.45"}, {"mesec": "2026-05", "nocna_osnova_kw": "0.35"}, {"mesec": "2026-06", "nocna_osnova_kw": "0.27"}, {"mesec": "2026-07", "nocna_osnova_kw": "0.28"}, {"mesec": "2026-08", "nocna_osnova_kw": "0.27"}, {"mesec": "2026-09", "nocna_osnova_kw": "0.27"}, {"mesec": "2026-10", "nocna_osnova_kw": "0.51"}], "konice": [{"cas": "2025-01-19 13:00", "dan": "ned", "kw": "15.5", "blok": "2"}, {"cas": "2026-02-22 10:15", "dan": "ned", "kw": "14.8", "blok": "2"}, {"cas": "2024-12-31 18:30", "dan": "tor", "kw": "14.7", "blok": "1"}, {"cas": "2025-02-16 16:30", "dan": "ned", "kw": "14.7", "blok": "2"}, {"cas": "2026-01-21 14:30", "dan": "sre", "kw": "14.4", "blok": "2"}, {"cas": "2025-01-19 12:45", "dan": "ned", "kw": "14.3", "blok": "2"}, {"cas": "2026-01-04 12:45", "dan": "ned", "kw": "14.1", "blok": "2"}, {"cas": "2025-01-19 13:15", "dan": "ned", "kw": "14.0", "blok": "2"}, {"cas": "2026-01-21 15:15", "dan": "sre", "kw": "13.9", "blok": "2"}, {"cas": "2026-01-21 14:45", "dan": "sre", "kw": "13.7", "blok": "2"}, {"cas": "2026-01-21 21:00", "dan": "sre", "kw": "13.6", "blok": "2"}, {"cas": "2026-01-23 17:45", "dan": "pet", "kw": "13.5", "blok": "1"}, {"cas": "2024-12-15 09:30", "dan": "ned", "kw": "13.3", "blok": "2"}, {"cas": "2026-01-21 15:00", "dan": "sre", "kw": "13.3", "blok": "2"}, {"cas": "2026-01-11 14:30", "dan": "ned", "kw": "13.3", "blok": "3"}], "omreznina": [{"mesec": "2025-09", "prenos_energije_eur": "19.0", "dogovorjena_moc_eur": "16.85", "drugi_prispevki_eur": "0.97", "prispevek_ove_eur": "12.11", "skupaj_eur": "48.93"}, {"mesec": "2025-10", "prenos_energije_eur": "39.7", "dogovorjena_moc_eur": "16.85", "drugi_prispevki_eur": "2.01", "prispevek_ove_eur": "12.11", "skupaj_eur": "70.67"}, {"mesec": "2025-11", "prenos_energije_eur": "58.09", "dogovorjena_moc_eur": "40.03", "drugi_prispevki_eur": "2.88", "prispevek_ove_eur": "5.25", "skupaj_eur": "106.25"}, {"mesec": "2025-12", "prenos_energije_eur": "78.4", "dogovorjena_moc_eur": "40.03", "drugi_prispevki_eur": "3.87", "prispevek_ove_eur": "5.25", "skupaj_eur": "127.55"}, {"mesec": "2026-01", "prenos_energije_eur": "92.39", "dogovorjena_moc_eur": "44.01", "drugi_prispevki_eur": "4.57", "prispevek_ove_eur": "5.68", "skupaj_eur": "146.65"}, {"mesec": "2026-02", "prenos_energije_eur": "57.2", "dogovorjena_moc_eur": "44.01", "drugi_prispevki_eur": "2.82", "prispevek_ove_eur": "5.68", "skupaj_eur": "109.71"}, {"mesec": "2026-03", "prenos_energije_eur": "45.1", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "2.34", "prispevek_ove_eur": "13.63", "skupaj_eur": "85.81"}, {"mesec": "2026-04", "prenos_energije_eur": "30.97", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "1.61", "prispevek_ove_eur": "13.63", "skupaj_eur": "70.95"}, {"mesec": "2026-05", "prenos_energije_eur": "24.07", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "1.25", "prispevek_ove_eur": "13.63", "skupaj_eur": "63.69"}, {"mesec": "2026-06", "prenos_energije_eur": "18.05", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "0.93", "prispevek_ove_eur": "13.63", "skupaj_eur": "57.35"}, {"mesec": "2026-07", "prenos_energije_eur": "17.9", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "0.91", "prispevek_ove_eur": "13.63", "skupaj_eur": "57.18"}, {"mesec": "2026-08", "prenos_energije_eur": "17.36", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "0.89", "prispevek_ove_eur": "13.63", "skupaj_eur": "56.62"}, {"mesec": "2026-09", "prenos_energije_eur": "19.34", "dogovorjena_moc_eur": "24.74", "drugi_prispevki_eur": "0.99", "prispevek_ove_eur": "13.63", "skupaj_eur": "58.7"}], "pv_mesecno": [{"mesec_st": "1", "poraba_kwh": "4025.0", "proizvodnja_kwh": "333.0", "porabljeno_doma_kwh": "324.0", "mesec": "jan"}, {"mesec_st": "2", "poraba_kwh": "2488.0", "proizvodnja_kwh": "515.0", "porabljeno_doma_kwh": "390.0", "mesec": "feb"}, {"mesec_st": "3", "poraba_kwh": "2064.0", "proizvodnja_kwh": "823.0", "porabljeno_doma_kwh": "485.0", "mesec": "mar"}, {"mesec_st": "4", "poraba_kwh": "1419.0", "proizvodnja_kwh": "1023.0", "porabljeno_doma_kwh": "450.0", "mesec": "apr"}, {"mesec_st": "5", "poraba_kwh": "1105.0", "proizvodnja_kwh": "1203.0", "porabljeno_doma_kwh": "423.0", "mesec": "maj"}, {"mesec_st": "6", "poraba_kwh": "818.0", "proizvodnja_kwh": "1286.0", "porabljeno_doma_kwh": "421.0", "mesec": "jun"}, {"mesec_st": "7", "poraba_kwh": "804.0", "proizvodnja_kwh": "1387.0", "porabljeno_doma_kwh": "407.0", "mesec": "jul"}, {"mesec_st": "8", "poraba_kwh": "784.0", "proizvodnja_kwh": "1186.0", "porabljeno_doma_kwh": "370.0", "mesec": "avg"}, {"mesec_st": "9", "poraba_kwh": "873.0", "proizvodnja_kwh": "856.0", "porabljeno_doma_kwh": "300.0", "mesec": "sep"}, {"mesec_st": "10", "poraba_kwh": "1622.0", "proizvodnja_kwh": "539.0", "porabljeno_doma_kwh": "316.0", "mesec": "okt"}, {"mesec_st": "11", "poraba_kwh": "2534.0", "proizvodnja_kwh": "314.0", "porabljeno_doma_kwh": "241.0", "mesec": "nov"}, {"mesec_st": "12", "poraba_kwh": "3415.0", "proizvodnja_kwh": "241.0", "porabljeno_doma_kwh": "228.0", "mesec": "dec"}], "scenariji": [{"scenarij": "6 kWp", "kwp": "6", "baterija_kwh": "0", "proizvodnja_kwh": "5823", "samoporaba_pct": "57", "samooskrba_pct": "15", "oddaja_kwh": "2483", "prihranek_energija_eur": "693", "prihranek_konice_eur": "0", "letni_prihranek_eur": "693", "investicija_eur": "5800", "subvencija_eur": "1450.0", "neto_investicija_eur": "4350.0", "vracilo_brez_subv_let": "8.4", "vracilo_s_subv_let": "6.3"}, {"scenarij": "6 kWp + 5 kWh", "kwp": "6", "baterija_kwh": "5", "proizvodnja_kwh": "5823", "samoporaba_pct": "76", "samooskrba_pct": "20", "oddaja_kwh": "1412", "prihranek_energija_eur": "804", "prihranek_konice_eur": "137", "letni_prihranek_eur": "941", "investicija_eur": "9100", "subvencija_eur": "3640.0", "neto_investicija_eur": "5460.0", "vracilo_brez_subv_let": "9.7", "vracilo_s_subv_let": "5.8"}, {"scenarij": "6 kWp + 10 kWh", "kwp": "6", "baterija_kwh": "10", "proizvodnja_kwh": "5823", "samoporaba_pct": "85", "samooskrba_pct": "22", "oddaja_kwh": "860", "prihranek_energija_eur": "856", "prihranek_konice_eur": "137", "letni_prihranek_eur": "993", "investicija_eur": "11600", "subvencija_eur": "4050.0", "neto_investicija_eur": "7550.0", "vracilo_brez_subv_let": "11.7", "vracilo_s_subv_let": "7.6"}, {"scenarij": "8 kWp", "kwp": "8", "baterija_kwh": "0", "proizvodnja_kwh": "7764", "samoporaba_pct": "50", "samooskrba_pct": "18", "oddaja_kwh": "3865", "prihranek_energija_eur": "857", "prihranek_konice_eur": "0", "letni_prihranek_eur": "857", "investicija_eur": "7400", "subvencija_eur": "1850.0", "neto_investicija_eur": "5550.0", "vracilo_brez_subv_let": "8.6", "vracilo_s_subv_let": "6.5"}, {"scenarij": "8 kWp + 5 kWh", "kwp": "8", "baterija_kwh": "5", "proizvodnja_kwh": "7764", "samoporaba_pct": "66", "samooskrba_pct": "23", "oddaja_kwh": "2674", "prihranek_energija_eur": "980", "prihranek_konice_eur": "137", "letni_prihranek_eur": "1117", "investicija_eur": "10700", "subvencija_eur": "4280.0", "neto_investicija_eur": "6420.0", "vracilo_brez_subv_let": "9.6", "vracilo_s_subv_let": "5.7"}, {"scenarij": "8 kWp + 10 kWh", "kwp": "8", "baterija_kwh": "10", "proizvodnja_kwh": "7764", "samoporaba_pct": "75", "samooskrba_pct": "26", "oddaja_kwh": "1956", "prihranek_energija_eur": "1049", "prihranek_konice_eur": "137", "letni_prihranek_eur": "1186", "investicija_eur": "13200", "subvencija_eur": "5280.0", "neto_investicija_eur": "7920.0", "vracilo_brez_subv_let": "11.1", "vracilo_s_subv_let": "6.7"}, {"scenarij": "10 kWp", "kwp": "10", "baterija_kwh": "0", "proizvodnja_kwh": "9704", "samoporaba_pct": "45", "samooskrba_pct": "20", "oddaja_kwh": "5349", "prihranek_energija_eur": "1009", "prihranek_konice_eur": "0", "letni_prihranek_eur": "1009", "investicija_eur": "9000", "subvencija_eur": "2250.0", "neto_investicija_eur": "6750.0", "vracilo_brez_subv_let": "8.9", "vracilo_s_subv_let": "6.7"}, {"scenarij": "10 kWp + 5 kWh", "kwp": "10", "baterija_kwh": "5", "proizvodnja_kwh": "9704", "samoporaba_pct": "58", "samooskrba_pct": "25", "oddaja_kwh": "4057", "prihranek_energija_eur": "1141", "prihranek_konice_eur": "137", "letni_prihranek_eur": "1278", "investicija_eur": "12300", "subvencija_eur": "4920.0", "neto_investicija_eur": "7380.0", "vracilo_brez_subv_let": "9.6", "vracilo_s_subv_let": "5.8"}, {"scenarij": "10 kWp + 10 kWh", "kwp": "10", "baterija_kwh": "10", "proizvodnja_kwh": "9704", "samoporaba_pct": "66", "samooskrba_pct": "28", "oddaja_kwh": "3254", "prihranek_energija_eur": "1218", "prihranek_konice_eur": "137", "letni_prihranek_eur": "1355", "investicija_eur": "14800", "subvencija_eur": "5920.0", "neto_investicija_eur": "8880.0", "vracilo_brez_subv_let": "10.9", "vracilo_s_subv_let": "6.6"}], "ukrepi": [{"id": "paket", "ukrep": "Zamenjaj paket pri ECE", "opis": "Plačujete redni cenik (VT 0,12479 / MT 0,10285 €/kWh brez DDV). Akcijski paket ECE FIKS B25/12 je 0,11876 / 0,09679. Pri vaši porabi to prinese okoli 160 € na leto. Preveri vezavo in primerjaj še druge dobavitelje.", "prihranek_min_eur": "150", "prihranek_max_eur": "165", "investicija_eur": "0"}, {"id": "konice", "ukrep": "Razporedi velike porabnike ob zimskih vikendih", "opis": "Najvišje konice so pozimi ob vikendih in praznikih okoli kosila (pečica, štedilnik, pralni/sušilni stroj, toplotna črpalka hkrati). Če nobena 15-min ne preseže ~12 kW, distributer naslednje leto nastavi nižjo dogovorjeno moč (14,4 → ~12 kW).", "prihranek_min_eur": "50", "prihranek_max_eur": "65", "investicija_eur": "0"}, {"id": "osnova", "ukrep": "Preveri stalno porabo", "opis": "Poleti tudi ponoči teče najmanj ~0,27 kW (okoli 2.400 kWh na leto). Stari zamrzovalniki, obtočne črpalke, omrežna oprema. 100 W manj je ~880 kWh na leto.", "prihranek_min_eur": "100", "prihranek_max_eur": "150", "investicija_eur": "0"}, {"id": "tc", "ukrep": "Nastavitve toplotne črpalke", "opis": "Ogrevanje je ocenjeno na ~12.000 kWh na leto. Pozimi ponoči TČ vleče stalnih 4–5 kW, občasno 8–11 kW, kar kaže na vklop električnega grelca. Nižja ogrevalna krivulja, grelec samo kot rezerva pri hudem mrazu, nižja temperatura sanitarne vode: 5–10 % manj.", "prihranek_min_eur": "100", "prihranek_max_eur": "200", "investicija_eur": "0"}, {"id": "pv", "ukrep": "Sončna elektrarna 8–10 kWp + hranilnik 5 kWh", "opis": "S subvencijo Borzen (do 675 €/kW, največ 40 %) se povrne v okoli 6 letih. Hranilnik naj pozimi drži konice pod 10 kW (funkcija omejevanja moči iz omrežja), kar zniža dogovorjeno moč.", "prihranek_min_eur": "1100", "prihranek_max_eur": "1300", "investicija_eur": "7400"}]};
+(function(){
+  const calcs={};
+  const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  window.dash={
+    get colors(){return ['--c1','--c2','--c3','--c4','--c5','--c6','--c1','--c2'].map(cssv);},
+    data(id){ if(calcs[id]) return {status:'ok',data:calcs[id]()}; return DATA[id]?{status:'ok',data:DATA[id],columns:Object.keys(DATA[id][0]||{})}:{status:'missing',data:[]}; },
+    calc(id,o){ calcs[id]=()=>o.fn(...o.inputs.map(i=>DATA[i])); },
+    onData(fn){ const go=()=>{try{fn();}catch(e){console.error(e);}}; if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();
+      let lw=window.innerWidth,tm; window.addEventListener('resize',()=>{clearTimeout(tm);tm=setTimeout(()=>{if(window.innerWidth!==lw){lw=window.innerWidth;go();}},150);});
+      if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',go); }
+  };
+})();
+</script>
+</head>
+<body>
+
+
+<div class="sp">
+  <div class="hd">
+    <h1 id="naslov">Elektrika naše hiše</h1>
+    <p class="lead" id="povzetek-stavek">Ogrevanje pozimi poje večino elektrike: november–februar je <b data-source="povzetek" data-field="vrednost" data-where="kazalnik=zimski_delez_pct" class="dash-skeleton">—</b> % letne porabe. Največji vzvodi so nastavitve toplotne črpalke, konice ob zimskih vikendih (te določajo dogovorjeno moč za vse leto) in sončna elektrarna z manjšim hranilnikom, ki se s subvencijo povrne v okoli <b data-source="scenariji" data-field="vracilo_s_subv_let" data-where="scenarij=10 kWp + 5 kWh" class="dash-skeleton">—</b> letih. Brez kakršnekoli investicije pa prihrani že zamenjava paketa pri dobavitelju.</p>
+  </div>
+
+  <div class="kpis" id="kazalniki">
+    <div class="kpi"><span class="l">Poraba, zadnjih 12 mesecev</span><span class="v"><span data-source="povzetek" data-field="vrednost" data-where="kazalnik=poraba_zadnje_leto_kwh" class="dash-skeleton">—</span> kWh</span><span class="s"><span data-source="rast_porabe" data-field="rast_pct" class="dash-skeleton">—</span> glede na leto prej</span></div>
+    <div class="kpi"><span class="l">Ocena letnega računa (z DDV)</span><span class="v"><span data-source="letni_strosek" data-field="skupaj_eur" class="dash-skeleton">—</span> €</span><span class="s">energija + omrežnina + prispevki</span></div>
+    <div class="kpi"><span class="l">Od tega dogovorjena moč</span><span class="v"><span data-source="povzetek" data-field="vrednost" data-where="kazalnik=strosek_dogovorjena_moc_eur" class="dash-skeleton">—</span> €</span><span class="s">fiksno, ne glede na porabo</span></div>
+    <div class="kpi"><span class="l">Najvišja 15-min konica</span><span class="v"><span data-source="povzetek" data-field="vrednost" data-where="kazalnik=max_konica_kw" class="dash-skeleton">—</span> kW</span><span class="s"><span data-source="povzetek" data-field="vrednost" data-where="kazalnik=dni_nad_12kw" class="dash-skeleton">—</span> dni nad 12 kW</span></div>
+    <div class="kpi"><span class="l">Stalna nočna poraba poleti</span><span class="v"><span data-source="povzetek" data-field="vrednost" data-where="kazalnik=poletna_nocna_osnova_kw" class="dash-skeleton">—</span> kW</span><span class="s">teče 24 ur na dan</span></div>
+  </div>
+
+  <section class="sec" id="poraba">
+    <h2>Poraba</h2>
+    <div class="card">
+      <h3 id="h-mesec">Poraba po mesecih, okt 2023 – okt 2026</h3>
+      <p class="note">Leta štejemo od oktobra do septembra. Svetlejša stolpca na začetku in koncu sta nepopolna meseca.</p>
+      <div class="legend" id="leg-mesec"></div>
+      <div class="chart" id="ch-mesec" data-source="mesecna"></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3 id="h-profil">Povprečen dan po urah, zadnjih 12 mesecev</h3>
+        <p class="note">Povprečna moč v kW. Pozimi toplotna črpalka teče ves dan; ob zimskih vikendih je opoldne največja poraba v letu.</p>
+        <div class="seg" role="group" aria-label="Vrsta dneva"><button type="button" id="b-delavnik" aria-pressed="true">Delavnik</button><button type="button" id="b-vikend" aria-pressed="false">Vikend</button></div>
+        <div class="legend" id="leg-profil"></div>
+        <div class="chart" id="ch-profil" data-source="profil"></div>
+      </div>
+      <div class="card">
+        <h3 id="h-osnova">Nočna osnovna poraba po mesecih</h3>
+        <p class="note">Mediana najnižje urne porabe v dnevu. Poleti je to čisti »standby« vseh treh gospodinjstev, pozimi pa vključuje ogrevanje.</p>
+        <div class="chart" id="ch-osnova" data-source="osnova"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="moc">
+    <h2>Omrežnina in dogovorjena moč</h2>
+    <p>Skoraj polovico omrežnine predstavlja dogovorjena moč, ki jo distributer vsako leto nastavi po vaših najvišjih 15-minutnih konicah. Konica v bloku 2 (zimski vikendi in delavniški robovi dneva) določi moč za bloke 2–5 za vse leto. Dokler moči ne spreminjate sami, se preseganje ne zaračuna.</p>
+    <div class="grid">
+      <div class="card">
+        <h3 id="h-omreznina">Račun za omrežnino po mesecih (z DDV)</h3>
+        <p class="note">Z obračunov distributerja, sep 2025 – sep 2026. Energija od dobavitelja je ločen račun.</p>
+        <div class="legend" id="leg-omr"></div>
+        <div class="chart" id="ch-omreznina" data-source="omreznina"></div>
+      </div>
+      <div class="card">
+        <h3 id="h-konice">Največje konice, okt 2024 – okt 2026</h3>
+        <p class="note">Skoraj vse so pozimi, večinoma ob nedeljah in praznikih okoli poldneva.</p>
+        <div class="tw">
+          <table id="t-konice" data-source="konice" data-row-key="cas">
+            <thead><tr><th data-field="cas">Čas začetka</th><th data-field="dan">Dan</th><th data-field="kw" class="n">kW</th><th data-field="blok" class="n">Blok</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="elektrarna">
+    <h2>Sončna elektrarna</h2>
+    <p>Simulacija na vaših dejanskih 15-minutnih podatkih: polovica panelov na vzhodni (≈75°) in polovica na zahodni (≈255°) ploskvi, naklon 35°. Višek se proda dobavitelju, neto merjenja za nove elektrarne ni več.</p>
+    <div class="card">
+      <h3 id="h-pv-mesec">10 kWp: proizvodnja proti porabi po mesecih</h3>
+      <p class="note">Poleti elektrarna proizvede več kot porabite, a večina gre v omrežje. Pozimi, ko porabite največ, proizvede zelo malo.</p>
+      <div class="legend" id="leg-pv"></div>
+      <div class="chart" id="ch-pv" data-source="pv_mesecno"></div>
+    </div>
+    <div class="card">
+      <h3 id="h-scenariji">Velikosti in hranilnik</h3>
+      <p class="note">Prihranek vključuje energijo, omrežnino na kWh, prispevke in DDV, minus izgubljeno pri odkupu viškov. Pri sistemih s hranilnikom je prištet še prihranek pri dogovorjeni moči, če hranilnik pozimi drži konice pod 10 kW. Subvencija Borzen: brez hranilnika 250 €/kW (največ 25 %), s hranilnikom 675 €/kW (največ 40 %). Investicija je groba ocena, ponudbe se lahko precej razlikujejo.</p>
+      <div class="tw">
+        <table id="t-scenariji" data-source="scenariji" data-row-key="scenarij">
+          <thead><tr><th data-field="scenarij">Sistem</th><th data-field="proizvodnja_kwh" class="n">Proizvodnja kWh/leto</th><th data-field="samoporaba_pct" class="n">Porabite doma</th><th data-field="samooskrba_pct" class="n">Pokrije porabe</th><th data-field="letni_prihranek_eur" class="n">Prihranek €/leto</th><th data-field="investicija_eur" class="n">Investicija €</th><th data-field="subvencija_eur" class="n">Subvencija €</th><th data-field="vracilo_brez_subv_let" class="n">Vračilo brez subv., let</th><th data-field="vracilo_s_subv_let" class="n">Vračilo s subv., let</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="ukrepi">
+    <h2>Kaj spremeniti</h2>
+    <div class="card">
+      <h3 id="h-ukrepi">Ukrepi, najprej tisti brez investicije</h3>
+      <p class="note">Ocene letnega prihranka z DDV.</p>
+      <div class="tw">
+        <table id="t-ukrepi" data-source="ukrepi" data-row-key="ukrep">
+          <thead><tr><th data-field="ukrep">Ukrep</th><th data-field="opis">Zakaj</th><th data-field="prihranek_min_eur" class="n">Prihranek od €</th><th data-field="prihranek_max_eur" class="n">do €</th><th data-field="investicija_eur" class="n">Investicija €</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="ass" id="predpostavke">Podatki: 15-minutne meritve števca z mojelektro.si (okt 2023 – okt 2026), mesečni obračuni omrežnine. Predpostavke: energija po rednem ceniku ECE VT 0,12479 in MT 0,10285 €/kWh brez DDV (VT med tednom 6–22), omrežnina po tarifah z obračunov za 2026, odkup viškov 0,05 €/kWh (pri 0,03 ali 0,07 se prihranek 10 kWp spremeni za ±100 €). Elektrarna: polovica panelov na vzhodni (≈75°), polovica na zahodni (≈255°) ploskvi, naklon 35° (še ni izmerjen). Proizvodnja je modelirana z jasnim nebom in naključnimi oblačnimi dnevi, umerjena na tipične mesečne donose PVGIS za Kranj: vzhod/zahod da ≈970 kWh/kWp, jug bi dal ≈1.150. Investicija: 1.000 € + 800 €/kWp, hranilnik 800 € + 500 €/kWh. Hranilnik: 90 % izkoristek, 5 kW moč. Analiza: oktober 2026.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  const nf0=new Intl.NumberFormat('sl-SI',{maximumFractionDigits:0});
+  const nf1=new Intl.NumberFormat('sl-SI',{minimumFractionDigits:1,maximumFractionDigits:1});
+  const nf2=new Intl.NumberFormat('sl-SI',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const MES=['jan','feb','mar','apr','maj','jun','jul','avg','sep','okt','nov','dec'];
+  window.SP={nf0,nf1,nf2,MES};
+
+  dash.calc('rast_porabe',{inputs:['povzetek'],title:'Rast porabe',description:'Sprememba porabe zadnjih 12 mesecev glede na 12 mesecev prej.',
+    fn:(povzetek)=>{const g=k=>Number(povzetek.find(r=>r.kazalnik===k).vrednost);return [{rast_pct:Math.round(1000*(g('poraba_zadnje_leto_kwh')/g('poraba_leto_prej_kwh')-1))/10}];}});
+  dash.calc('letni_strosek',{inputs:['povzetek'],title:'Ocena letnega računa',description:'Energija, omrežnina na kWh in prispevki z DDV plus dogovorjena moč in prispevek OVE z DDV.',
+    fn:(povzetek)=>{const g=k=>Number(povzetek.find(r=>r.kazalnik===k).vrednost);return [{skupaj_eur:g('strosek_energija_in_prenos_eur')+g('strosek_dogovorjena_moc_eur')}];}});
+
+  let profDan='Delavnik';
+  const bD=document.getElementById('b-delavnik'), bV=document.getElementById('b-vikend');
+  function setDan(v){profDan=v;bD.setAttribute('aria-pressed',v==='Delavnik');bV.setAttribute('aria-pressed',v==='Vikend');drawProfil();}
+  bD.addEventListener('click',()=>setDan('Delavnik')); bV.addEventListener('click',()=>setDan('Vikend'));
+
+  function tip(box){let t=box.querySelector('.tt');if(!t){t=document.createElement('div');t.className='tt';t.hidden=true;box.appendChild(t);}return t;}
+  function showTip(box,t,lines,x,y){t.replaceChildren();lines.forEach((ln,i)=>{const r=document.createElement('div');if(i===0)r.className='tt-h';if(ln.color){const s=document.createElement('span');s.className='sw';s.style.background=ln.color;r.appendChild(s);}r.appendChild(document.createTextNode(ln.text));t.appendChild(r);});t.hidden=false;const bw=box.clientWidth,tw=t.offsetWidth;let left=x+14;if(left+tw>bw)left=x-tw-14;if(left<0)left=0;t.style.left=left+'px';t.style.top=Math.max(0,y-20)+'px';}
+  function prep(box,id){
+    const st=dash.data(id).status;
+    box.querySelectorAll('svg,.fail').forEach(n=>n.remove());
+    const tt=box.querySelector('.tt'); if(tt) tt.hidden=true;
+    box.classList.toggle('dash-skeleton',st==='loading');
+    if(st==='error'||st==='connect'||st==='declined'||st==='missing'){const f=document.createElement('div');f.className='fail';const d=document.createElement('span');d.className='dot';f.appendChild(d);f.appendChild(document.createTextNode('Ni se naložilo'));box.appendChild(f);}
+    return st==='ok';
+  }
+  function legend(el,items){el.replaceChildren();items.forEach(([name,color])=>{const s=document.createElement('span');s.className='k';const i=document.createElement('i');i.style.background=color;s.appendChild(i);s.appendChild(document.createTextNode(name));el.appendChild(s);});}
+  function yAxis(svg,y,W,ml,fmt,ticks){
+    const g=svg.append('g');
+    y.ticks(ticks).forEach(v=>{g.append('line').attr('x1',ml).attr('x2',W).attr('y1',y(v)).attr('y2',y(v)).style('stroke','var(--cds-chart-grid)').attr('stroke-width',1);
+      g.append('text').attr('x',ml-6).attr('y',y(v)).attr('dy','0.32em').attr('text-anchor','end').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text(fmt(v));});
+  }
+  function measure(svg,texts){const t=svg.append('text').style('font-size','var(--cds-font-size-caption)');let m=0;texts.forEach(s=>{t.text(s);m=Math.max(m,t.node().getComputedTextLength());});t.remove();return Math.ceil(m);}
+  function mkSvg(box,W,H){return d3.select(box).append('svg').attr('width','100%').attr('viewBox',`0 0 ${W} ${H}`).attr('role','img').style('display','block').style('overflow','visible');}
+
+  function drawMesec(){
+    const box=document.getElementById('ch-mesec'); const C=dash.colors;
+    legend(document.getElementById('leg-mesec'),[['2023/24',C[0]],['2024/25',C[1]],['2025/26',C[2]],['2026/27',C[3]]]);
+    if(!prep(box,'mesecna'))return;
+    const rows=dash.data('mesecna').data.map(r=>({m:r.mesec,kwh:+r.kwh,max:+r.max_kw,dni:+r.dni_v_podatkih}));
+    const yi=m=>m<'2024-10'?0:m<'2025-10'?1:m<'2026-10'?2:3;
+    const W=Math.max(300,box.clientWidth),H=260;
+    const svg=mkSvg(box,W,H);
+    const y=d3.scaleLinear([0,d3.max(rows,r=>r.kwh)*1.05],[H-26,8]).nice();
+    const fmt=v=>nf0.format(v);
+    const ml=measure(svg,y.ticks(5).map(fmt))+10;
+    yAxis(svg,y,W,ml,fmt,5);
+    const x=d3.scaleBand(rows.map(r=>r.m),[ml,W]).padding(0.22);
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('x',r=>x(r.m)).attr('width',x.bandwidth()).attr('y',r=>y(r.kwh)).attr('height',r=>y(0)-y(r.kwh)).attr('rx',Math.min(4,x.bandwidth()/2)).style('fill',r=>C[yi(r.m)]).attr('opacity',r=>r.dni<28?0.4:1);
+    svg.append('line').attr('x1',ml).attr('x2',W).attr('y1',y(0)).attr('y2',y(0)).style('stroke','var(--cds-chart-axis)');
+    const lab=rows.filter(r=>r.m.slice(5)==='01'||(W>560&&r.m.slice(5)==='07'));
+    svg.append('g').selectAll('text').data(lab).join('text').attr('x',r=>x(r.m)+x.bandwidth()/2).attr('y',H-8).attr('text-anchor','middle').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text(r=>MES[+r.m.slice(5)-1]+' '+r.m.slice(2,4));
+    const t=tip(box);
+    svg.append('rect').attr('x',ml).attr('width',W-ml).attr('y',0).attr('height',H).style('fill','transparent')
+      .on('mousemove',ev=>{const [px,py]=d3.pointer(ev);const i=Math.max(0,Math.min(rows.length-1,Math.floor((px-ml)/x.step())));const r=rows[i];
+        showTip(box,t,[{text:MES[+r.m.slice(5)-1]+' '+r.m.slice(0,4)+(r.dni<28?' (nepopoln)':'')},{text:nf0.format(r.kwh)+' kWh',color:C[yi(r.m)]},{text:'konica '+nf1.format(r.max)+' kW'}],px,py);})
+      .on('mouseleave',()=>{t.hidden=true;});
+  }
+
+  function drawProfil(){
+    const box=document.getElementById('ch-profil'); const C=dash.colors;
+    const S=[['Zima (dec–feb)',C[0]],['Pomlad/jesen',C[1]],['Poletje (jun–avg)',C[2]]];
+    legend(document.getElementById('leg-profil'),S);
+    if(!prep(box,'profil'))return;
+    const rows=dash.data('profil').data.filter(r=>r.dan===profDan).map(r=>({s:r.sezona,h:+r.ura,kw:+r.kw}));
+    const all=dash.data('profil').data.map(r=>+r.kw);
+    const W=Math.max(280,box.clientWidth),H=260;
+    const svg=mkSvg(box,W,H);
+    const y=d3.scaleLinear([0,d3.max(all)*1.05],[H-26,8]).nice();
+    const fmt=v=>nf0.format(v)+' kW';
+    const ml=measure(svg,y.ticks(5).map(fmt))+10;
+    yAxis(svg,y,W,ml,fmt,5);
+    const x=d3.scaleLinear([0,23],[ml+4,W-6]);
+    [0,6,12,18,23].forEach(h=>svg.append('text').attr('x',x(h)).attr('y',H-8).attr('text-anchor','middle').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text(h+'h'));
+    const line=d3.line().x(d=>x(d.h)).y(d=>y(d.kw));
+    S.forEach(([name,col])=>{const d=rows.filter(r=>r.s===name).sort((a,b)=>a.h-b.h);svg.append('path').datum(d).attr('d',line).style('fill','none').style('stroke',col).attr('stroke-width',2).attr('stroke-linecap','round').attr('stroke-linejoin','round');});
+    const t=tip(box); const rule=svg.append('line').attr('y1',8).attr('y2',H-26).style('stroke','var(--cds-chart-reference)').attr('opacity',0);
+    svg.append('rect').attr('x',ml).attr('width',W-ml).attr('height',H).style('fill','transparent')
+      .on('mousemove',ev=>{const [px,py]=d3.pointer(ev);const h=Math.max(0,Math.min(23,Math.round(x.invert(px))));rule.attr('x1',x(h)).attr('x2',x(h)).attr('opacity',1);
+        showTip(box,t,[{text:profDan+', '+h+':00–'+(h+1)+':00'}].concat(S.map(([n,c])=>{const r=rows.find(q=>q.s===n&&q.h===h);return {text:n+': '+(r?nf2.format(r.kw):'–')+' kW',color:c};})),px,py);})
+      .on('mouseleave',()=>{t.hidden=true;rule.attr('opacity',0);});
+  }
+
+  function drawOsnova(){
+    const box=document.getElementById('ch-osnova'); const C=dash.colors;
+    if(!prep(box,'osnova'))return;
+    const rows=dash.data('osnova').data.map(r=>({m:r.mesec,d:new Date(r.mesec+'-15'),kw:+r.nocna_osnova_kw}));
+    const W=Math.max(280,box.clientWidth),H=260;
+    const svg=mkSvg(box,W,H);
+    const y=d3.scaleLinear([0,d3.max(rows,r=>r.kw)*1.1],[H-26,8]).nice();
+    const fmt=v=>nf1.format(v)+' kW';
+    const ml=measure(svg,y.ticks(5).map(fmt))+10;
+    yAxis(svg,y,W,ml,fmt,5);
+    const x=d3.scaleUtc(d3.extent(rows,r=>r.d),[ml+4,W-6]);
+    rows.filter(r=>r.m.slice(5)==='01').forEach(r=>svg.append('text').attr('x',x(r.d)).attr('y',H-8).attr('text-anchor','middle').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text('jan '+r.m.slice(2,4)));
+    svg.append('path').datum(rows).attr('d',d3.line().x(r=>x(r.d)).y(r=>y(r.kw))).style('fill','none').style('stroke',C[0]).attr('stroke-width',2).attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    const t=tip(box); const dot=svg.append('circle').attr('r',4).style('fill',C[0]).attr('opacity',0);
+    svg.append('rect').attr('x',ml).attr('width',W-ml).attr('height',H).style('fill','transparent')
+      .on('mousemove',ev=>{const [px,py]=d3.pointer(ev);const xd=x.invert(px);const r=rows.reduce((a,b)=>Math.abs(b.d-xd)<Math.abs(a.d-xd)?b:a);dot.attr('cx',x(r.d)).attr('cy',y(r.kw)).attr('opacity',1);
+        showTip(box,t,[{text:MES[+r.m.slice(5)-1]+' '+r.m.slice(0,4)},{text:nf2.format(r.kw)+' kW'}],x(r.d),y(r.kw));})
+      .on('mouseleave',()=>{t.hidden=true;dot.attr('opacity',0);});
+  }
+
+  function drawOmr(){
+    const box=document.getElementById('ch-omreznina'); const C=dash.colors;
+    const K=[['dogovorjena_moc_eur','Dogovorjena moč',C[0]],['prispevek_ove_eur','Prispevek OVE (po moči)',C[3]],['prenos_energije_eur','Prenos energije (po kWh)',C[1]],['drugi_prispevki_eur','Drugi prispevki',C[4]]];
+    legend(document.getElementById('leg-omr'),K.map(k=>[k[1],k[2]]));
+    if(!prep(box,'omreznina'))return;
+    const rows=dash.data('omreznina').data.map(r=>{const o={m:r.mesec};K.forEach(k=>o[k[0]]=+r[k[0]]);o.sk=+r.skupaj_eur;return o;});
+    const W=Math.max(280,box.clientWidth),H=260;
+    const svg=mkSvg(box,W,H);
+    const y=d3.scaleLinear([0,d3.max(rows,r=>r.sk)*1.05],[H-26,8]).nice();
+    const fmt=v=>nf0.format(v)+' €';
+    const ml=measure(svg,y.ticks(5).map(fmt))+10;
+    yAxis(svg,y,W,ml,fmt,5);
+    const x=d3.scaleBand(rows.map(r=>r.m),[ml,W]).padding(0.25);
+    const st=d3.stack().keys(K.map(k=>k[0]))(rows);
+    st.forEach((layer,i)=>svg.append('g').selectAll('rect').data(layer).join('rect').attr('x',d=>x(d.data.m)).attr('width',x.bandwidth()).attr('y',d=>y(d[1])).attr('height',d=>Math.max(0,y(d[0])-y(d[1]))).style('fill',K[i][2]));
+    svg.append('line').attr('x1',ml).attr('x2',W).attr('y1',y(0)).attr('y2',y(0)).style('stroke','var(--cds-chart-axis)');
+    const every=W<480?3:2;
+    svg.append('g').selectAll('text').data(rows.filter((r,i)=>i%every===0)).join('text').attr('x',r=>x(r.m)+x.bandwidth()/2).attr('y',H-8).attr('text-anchor','middle').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text(r=>MES[+r.m.slice(5)-1]+' '+r.m.slice(2,4));
+    const t=tip(box);
+    svg.append('rect').attr('x',ml).attr('width',W-ml).attr('height',H).style('fill','transparent')
+      .on('mousemove',ev=>{const [px,py]=d3.pointer(ev);const i=Math.max(0,Math.min(rows.length-1,Math.floor((px-ml)/x.step())));const r=rows[i];
+        showTip(box,t,[{text:MES[+r.m.slice(5)-1]+' '+r.m.slice(0,4)+': '+nf2.format(r.sk)+' €'}].concat(K.map(k=>({text:k[1]+': '+nf2.format(r[k[0]])+' €',color:k[2]}))),px,py);})
+      .on('mouseleave',()=>{t.hidden=true;});
+  }
+
+  function drawPV(){
+    const box=document.getElementById('ch-pv'); const C=dash.colors;
+    const K=[['poraba_kwh','Poraba','var(--cds-chart-muted)'],['proizvodnja_kwh','Proizvodnja 10 kWp',C[2]],['porabljeno_doma_kwh','Od tega porabljeno doma',C[0]]];
+    legend(document.getElementById('leg-pv'),K.map(k=>[k[1],k[2]]));
+    if(!prep(box,'pv_mesecno'))return;
+    const rows=dash.data('pv_mesecno').data.map(r=>({m:r.mesec,i:+r.mesec_st,poraba_kwh:+r.poraba_kwh,proizvodnja_kwh:+r.proizvodnja_kwh,porabljeno_doma_kwh:+r.porabljeno_doma_kwh})).sort((a,b)=>a.i-b.i);
+    const W=Math.max(280,box.clientWidth),H=260;
+    const svg=mkSvg(box,W,H);
+    const y=d3.scaleLinear([0,d3.max(rows,r=>Math.max(r.poraba_kwh,r.proizvodnja_kwh))*1.05],[H-26,8]).nice();
+    const fmt=v=>nf0.format(v);
+    const ml=measure(svg,y.ticks(5).map(fmt))+10;
+    yAxis(svg,y,W,ml,fmt,5);
+    const x=d3.scaleBand(rows.map(r=>r.m),[ml,W]).padding(0.2);
+    const xi=d3.scaleBand([0,1],[0,x.bandwidth()]).padding(0.08);
+    // poraba bar (left), proizvodnja bar (right) with self-consumed overlay
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('x',r=>x(r.m)+xi(0)).attr('width',xi.bandwidth()).attr('y',r=>y(r.poraba_kwh)).attr('height',r=>y(0)-y(r.poraba_kwh)).attr('rx',Math.min(4,xi.bandwidth()/2)).style('fill',K[0][2]);
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('x',r=>x(r.m)+xi(1)).attr('width',xi.bandwidth()).attr('y',r=>y(r.proizvodnja_kwh)).attr('height',r=>y(0)-y(r.proizvodnja_kwh)).attr('rx',Math.min(4,xi.bandwidth()/2)).style('fill',K[1][2]);
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('x',r=>x(r.m)+xi(1)).attr('width',xi.bandwidth()).attr('y',r=>y(r.porabljeno_doma_kwh)).attr('height',r=>y(0)-y(r.porabljeno_doma_kwh)).style('fill',K[2][2]);
+    svg.append('line').attr('x1',ml).attr('x2',W).attr('y1',y(0)).attr('y2',y(0)).style('stroke','var(--cds-chart-axis)');
+    svg.append('g').selectAll('text').data(rows.filter((r,i)=>W>460||i%2===0)).join('text').attr('x',r=>x(r.m)+x.bandwidth()/2).attr('y',H-8).attr('text-anchor','middle').style('fill','var(--color-fg-muted)').style('font-size','var(--cds-font-size-caption)').text(r=>r.m);
+    const t=tip(box);
+    svg.append('rect').attr('x',ml).attr('width',W-ml).attr('height',H).style('fill','transparent')
+      .on('mousemove',ev=>{const [px,py]=d3.pointer(ev);const i=Math.max(0,Math.min(rows.length-1,Math.floor((px-ml)/x.step())));const r=rows[i];
+        showTip(box,t,[{text:r.m}].concat(K.map(k=>({text:k[1]+': '+nf0.format(r[k[0]])+' kWh',color:k[2]}))).concat([{text:'v omrežje: '+nf0.format(r.proizvodnja_kwh-r.porabljeno_doma_kwh)+' kWh'}]),px,py);})
+      .on('mouseleave',()=>{t.hidden=true;});
+  }
+
+  function fillTable(id,src,cols,opts){
+    const tb=document.querySelector('#'+id+' tbody'); tb.replaceChildren();
+    const st=dash.data(src).status;
+    if(st!=='ok'){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=cols.length;td.textContent=st==='loading'?'':'Ni se naložilo';if(st==='loading')td.className='dash-skeleton';tr.appendChild(td);tb.appendChild(tr);return;}
+    dash.data(src).data.forEach(r=>{const tr=document.createElement('tr');if(opts&&opts.hl&&opts.hl(r))tr.className='hl';
+      cols.forEach(([f,fmt,cls])=>{const td=document.createElement('td');if(cls)td.className=cls;td.textContent=fmt?fmt(r[f]):r[f];tr.appendChild(td);});tb.appendChild(tr);});
+  }
+
+  function drawAll(){
+    // header numbers
+    const P=dash.data('povzetek');
+    document.querySelectorAll('[data-source="povzetek"]').forEach(el=>{
+      if(P.status!=='ok'){el.classList.toggle('dash-skeleton',P.status==='loading');if(P.status!=='loading')el.textContent='—';return;}
+      el.classList.remove('dash-skeleton');
+      const k=decodeURIComponent(el.dataset.where.split('=')[1]);const row=P.data.find(r=>r.kazalnik===k);const v=row?Number(row.vrednost):NaN;
+      el.textContent=isNaN(v)?'—':(k.endsWith('_kw')?nf1.format(v):k==='poletna_nocna_osnova_kw'?nf2.format(v):nf0.format(v));
+      if(k==='poletna_nocna_osnova_kw'&&!isNaN(v))el.textContent=nf2.format(v);
+    });
+    const R=dash.data('rast_porabe'),el1=document.querySelector('[data-source="rast_porabe"]');
+    if(R.status==='ok'&&R.data.length){el1.classList.remove('dash-skeleton');const v=R.data[0].rast_pct;el1.textContent=(v>0?'+':'')+nf1.format(v)+' %';el1.className=v>0?'up':'';}
+    const L=dash.data('letni_strosek'),el2=document.querySelector('[data-source="letni_strosek"]');
+    if(L.status==='ok'&&L.data.length){el2.classList.remove('dash-skeleton');el2.textContent=nf0.format(L.data[0].skupaj_eur);}
+    const Sc=dash.data('scenariji'),el3=document.querySelector('#povzetek-stavek [data-source="scenariji"]');
+    if(Sc.status==='ok'){el3.classList.remove('dash-skeleton');const r=Sc.data.find(q=>q.scenarij==='10 kWp + 5 kWh');el3.textContent=r?nf0.format(Number(r.vracilo_s_subv_let)):'—';}
+
+    drawMesec();drawProfil();drawOsnova();drawOmr();drawPV();
+    fillTable('t-konice','konice',[['cas'],['dan'],['kw',v=>nf1.format(+v),'n'],['blok',null,'n']]);
+    fillTable('t-scenariji','scenariji',[['scenarij'],['proizvodnja_kwh',v=>nf0.format(+v),'n'],['samoporaba_pct',v=>v+' %','n'],['samooskrba_pct',v=>v+' %','n'],['letni_prihranek_eur',v=>nf0.format(+v),'n'],['investicija_eur',v=>nf0.format(+v),'n'],['subvencija_eur',v=>nf0.format(+v),'n'],['vracilo_brez_subv_let',v=>nf1.format(+v),'n'],['vracilo_s_subv_let',v=>nf1.format(+v),'n']],{hl:r=>r.scenarij==='10 kWp + 5 kWh'||r.scenarij==='8 kWp + 5 kWh'});
+    fillTable('t-ukrepi','ukrepi',[['ukrep'],['opis',null,'desc'],['prihranek_min_eur',v=>nf0.format(+v),'n'],['prihranek_max_eur',v=>nf0.format(+v),'n'],['investicija_eur',v=>+v?nf0.format(+v):'0','n']]);
+  }
+  dash.onData(drawAll);
+})();
+</script>
+
+</body>
+</html>
